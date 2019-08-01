@@ -9,6 +9,9 @@ import { HTMLStencilElement, JSXBase } from './stencil.core';
 
 
 export namespace Components {
+  interface KeyframeEditor {
+    'open': boolean;
+  }
   interface KeyframedAudioPlayer {
     'name': string;
     'url': string;
@@ -18,23 +21,34 @@ export namespace Components {
 declare global {
 
 
+  interface HTMLKeyframeEditorElement extends Components.KeyframeEditor, HTMLStencilElement {}
+  var HTMLKeyframeEditorElement: {
+    prototype: HTMLKeyframeEditorElement;
+    new (): HTMLKeyframeEditorElement;
+  };
+
   interface HTMLKeyframedAudioPlayerElement extends Components.KeyframedAudioPlayer, HTMLStencilElement {}
   var HTMLKeyframedAudioPlayerElement: {
     prototype: HTMLKeyframedAudioPlayerElement;
     new (): HTMLKeyframedAudioPlayerElement;
   };
   interface HTMLElementTagNameMap {
+    'keyframe-editor': HTMLKeyframeEditorElement;
     'keyframed-audio-player': HTMLKeyframedAudioPlayerElement;
   }
 }
 
 declare namespace LocalJSX {
+  interface KeyframeEditor extends JSXBase.HTMLAttributes<HTMLKeyframeEditorElement> {
+    'open'?: boolean;
+  }
   interface KeyframedAudioPlayer extends JSXBase.HTMLAttributes<HTMLKeyframedAudioPlayerElement> {
     'name'?: string;
     'url'?: string;
   }
 
   interface IntrinsicElements {
+    'keyframe-editor': KeyframeEditor;
     'keyframed-audio-player': KeyframedAudioPlayer;
   }
 }

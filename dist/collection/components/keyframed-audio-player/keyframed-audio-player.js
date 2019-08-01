@@ -1,6 +1,6 @@
 import { h } from '@stencil/core';
 import { getTimecode } from '../../utils/utils';
-export class MyComponent {
+export class KeyframedAudioPlayer {
     constructor() {
         this.isPlaying = true;
         this.currentTime = 0;
@@ -28,6 +28,7 @@ export class MyComponent {
     componentDidLoad() {
         this.audioFile = new Audio(this.url);
         this.audioFile.addEventListener('timeupdate', this.updateTime);
+        this.audioFile.addEventListener('ended', this.togglePlay);
         this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
     }
     render() {
@@ -38,7 +39,8 @@ export class MyComponent {
                 h("div", { class: "play-container" },
                     h("div", { class: (this.isPlaying ? "play" : "pause") + " btn", onClick: this.togglePlay })),
                 h("div", { class: "name" }, this.name),
-                h("div", { class: "time" }, this.getTime())));
+                h("div", { class: "time" }, this.getTime())),
+            h("keyframe-editor", { open: true }));
     }
     static get is() { return "keyframed-audio-player"; }
     static get encapsulation() { return "shadow"; }

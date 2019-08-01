@@ -1,4 +1,4 @@
-export declare class MyComponent {
+export declare class KeyframedAudioPlayer {
     name: string;
     url: string;
     isPlaying: boolean;

@@ -7,7 +7,7 @@ import { getTimecode } from '../../utils/utils'
   shadow: true
 })
 
-export class MyComponent {
+export class KeyframedAudioPlayer {
   @Prop() name: string;
   @Prop() url: string;
 
@@ -19,6 +19,7 @@ export class MyComponent {
   componentDidLoad() {
     this.audioFile = new Audio(this.url);
     this.audioFile.addEventListener('timeupdate', this.updateTime)
+    this.audioFile.addEventListener('ended', this.togglePlay)
     this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration)
   }
 
@@ -60,6 +61,7 @@ export class MyComponent {
           {this.getTime()}
         </div>
       </div>
+      <keyframe-editor open={true}></keyframe-editor>
     </div>;
   }
 }
