@@ -1,9 +1,14 @@
 export declare class KeyframeEditor {
     open: boolean;
-    keyframes: any[];
-    private canvas?;
+    private canvasElement?;
     private canvasContainer?;
-    addKeyframe: () => void;
+    private canvas;
+    addKeyframe: (e: any) => void;
+    handleHover: (e: any) => void;
+    getPos: (e: any) => {
+        x: number;
+        y: number;
+    };
     componentDidLoad(): void;
     render(): any;
 }

@@ -1,5 +1,5 @@
-import { Component, Prop, State, h } from '@stencil/core';
-import { initialize } from './canvas'
+import { Component, Prop, h } from '@stencil/core';
+import Canvas from './canvas'
 
 @Component({
   tag: 'keyframe-editor',
@@ -10,39 +10,49 @@ import { initialize } from './canvas'
 export class KeyframeEditor {
   @Prop() open: boolean;
 
-  @State() keyframes: any[] = ['hi', 'hello', 'hey'];
-
-  private canvas?: HTMLCanvasElement;
+  private canvasElement?: HTMLCanvasElement;
   private canvasContainer?: HTMLDivElement;
+  private canvas: Canvas;
 
-  addKeyframe = () => {
-    this.keyframes = [...this.keyframes, 'bargles']
+  addKeyframe = e => {
+    const { x, y } = this.getPos(e);
+    this.canvas.addKeyframe(x, y);
+  }
+
+  handleHover = e => {
+    this.canvas.handleHover(this.getPos(e))
+  }
+
+  getPos = e => {
+    const { x, y } = e.target.getBoundingClientRect();
+    return {
+      x: ~~(e.clientX - x),
+      y: ~~(e.clientY - y)
+    }
   }
 
   componentDidLoad() {
     const { width, height } = this.canvasContainer.getBoundingClientRect();
-    this.canvas.width = width
-    this.canvas.height = height
-    
-    const ctx = this.canvas.getContext('2d');
-    initialize(ctx);
+    this.canvasElement.width = width
+    this.canvasElement.height = height
+
+    this.canvas = new Canvas(this.canvasElement);
+    this.canvas.draw();
   }
 
   render() {
     return (
-      <div 
+      <div
         class="keyframe-editor"
         ref={el => this.canvasContainer = el as HTMLDivElement}
         onClick={this.addKeyframe}
+        onMouseMove={this.handleHover}
       >
-        <canvas 
-          width="100%" 
-          height="500%" 
-          ref={el => this.canvas = el as HTMLCanvasElement} 
+        <canvas
+          width="100%"
+          height="500%"
+          ref={el => this.canvasElement = el as HTMLCanvasElement}
         />
-        {this.keyframes.map(keyframe => (
-          <div class="keyframe">{keyframe}</div>
-        ))}
       </div>
     )
   }

@@ -1,4 +1,5 @@
 .keyframe-editor {
-    height: 50px;
-    background: rgb(226, 226, 226);
+  height: 50px;
+  background: rgb(226, 226, 226);
+  cursor: pointer;
 }
