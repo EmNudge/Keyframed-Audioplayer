@@ -9,11 +9,14 @@ export default class Canvas {
     ctx: CanvasRenderingContext2D;
     keyframes: Position[];
     mousePos: Position;
-    hoveredIndex: number;
+    draggingIndex: number;
     constructor(canvas: HTMLCanvasElement);
     draw(): void;
     handleHover(mousePos: Position): void;
-    addKeyframe(x: number, y: number): void;
+    onClick(x: number, y: number): void;
+    onRelease(): void;
+    sortKeyframes(keyframes: any): any;
+    getKeyframeIndex(pos: any): number;
     drawLine(): void;
     getDist(point: Position, circle: Position): number;
     drawKeyframe(pos: Position): void;

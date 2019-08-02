@@ -10,7 +10,7 @@ export default class Canvas {
   ctx: CanvasRenderingContext2D;
   keyframes: Position[];
   mousePos: Position;
-  hoveredIndex: number;
+  draggingIndex: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -33,10 +33,43 @@ export default class Canvas {
 
   handleHover(mousePos: Position) {
     this.mousePos = mousePos;
+    if (this.draggingIndex === null) return;
+    
+    this.keyframes = this.sortKeyframes(this.keyframes.map((pos, index) => 
+      this.draggingIndex !== index ? pos : mousePos
+    ))
+    this.draggingIndex = this.getKeyframeIndex(mousePos)
   }
 
-  addKeyframe(x: number, y: number) {
-    this.keyframes = [...this.keyframes, { x, y }].sort((pos1, pos2) => pos1.x - pos2.x);
+  onClick(x: number, y: number) {
+    let draggingIndex = null;
+    for (const [index, pos] of this.keyframes.entries()) {
+      if (this.getDist({ x, y }, pos) >= 8) continue;
+      draggingIndex = index;
+    }
+
+    if (draggingIndex === null) {
+      this.keyframes = this.sortKeyframes([...this.keyframes, { x, y }]);
+      this.draggingIndex = this.getKeyframeIndex({ x, y })
+    } else {
+      this.draggingIndex = draggingIndex;
+    }
+  }
+
+  onRelease() {
+    this.draggingIndex = null;
+  }
+
+  sortKeyframes(keyframes) {
+    return keyframes.sort((pos1, pos2) => pos1.x - pos2.x)
+  }
+
+  getKeyframeIndex(pos) {
+    for (const [index, pos1] of this.keyframes.entries()) {
+      if (pos1.x === pos.x && pos1.y === pos.y) {
+        return index;
+      }
+    }
   }
 
   drawLine() {

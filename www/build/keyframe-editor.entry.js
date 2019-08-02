@@ -18,9 +18,38 @@ class Canvas {
     }
     handleHover(mousePos) {
         this.mousePos = mousePos;
+        if (this.draggingIndex === null)
+            return;
+        this.keyframes = this.sortKeyframes(this.keyframes.map((pos, index) => this.draggingIndex !== index ? pos : mousePos));
+        this.draggingIndex = this.getKeyframeIndex(mousePos);
     }
-    addKeyframe(x, y) {
-        this.keyframes = [...this.keyframes, { x, y }].sort((pos1, pos2) => pos1.x - pos2.x);
+    onClick(x, y) {
+        let draggingIndex = null;
+        for (const [index, pos] of this.keyframes.entries()) {
+            if (this.getDist({ x, y }, pos) >= 8)
+                continue;
+            draggingIndex = index;
+        }
+        if (draggingIndex === null) {
+            this.keyframes = this.sortKeyframes([...this.keyframes, { x, y }]);
+            this.draggingIndex = this.getKeyframeIndex({ x, y });
+        }
+        else {
+            this.draggingIndex = draggingIndex;
+        }
+    }
+    onRelease() {
+        this.draggingIndex = null;
+    }
+    sortKeyframes(keyframes) {
+        return keyframes.sort((pos1, pos2) => pos1.x - pos2.x);
+    }
+    getKeyframeIndex(pos) {
+        for (const [index, pos1] of this.keyframes.entries()) {
+            if (pos1.x === pos.x && pos1.y === pos.y) {
+                return index;
+            }
+        }
     }
     drawLine() {
         let prevPos = {
@@ -61,9 +90,12 @@ class Canvas {
 class KeyframeEditor {
     constructor(hostRef) {
         registerInstance(this, hostRef);
-        this.addKeyframe = e => {
+        this.canvasClick = e => {
             const { x, y } = this.getPos(e);
-            this.canvas.addKeyframe(x, y);
+            this.canvas.onClick(x, y);
+        };
+        this.canvasRelease = () => {
+            this.canvas.onRelease();
         };
         this.handleHover = e => {
             this.canvas.handleHover(this.getPos(e));
@@ -84,7 +116,7 @@ class KeyframeEditor {
         this.canvas.draw();
     }
     render() {
-        return (h("div", { class: "keyframe-editor", ref: el => this.canvasContainer = el, onClick: this.addKeyframe, onMouseMove: this.handleHover }, h("canvas", { width: "100%", height: "500%", ref: el => this.canvasElement = el })));
+        return (h("div", { class: "keyframe-editor", ref: el => this.canvasContainer = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover }, h("canvas", { width: "100%", height: "500%", ref: el => this.canvasElement = el })));
     }
     static get style() { return ".keyframe-editor {\n  height: 50px;\n  background: rgb(226, 226, 226);\n  cursor: pointer;\n}"; }
 }

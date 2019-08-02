@@ -14,9 +14,13 @@ export class KeyframeEditor {
   private canvasContainer?: HTMLDivElement;
   private canvas: Canvas;
 
-  addKeyframe = e => {
+  canvasClick = e => {
     const { x, y } = this.getPos(e);
-    this.canvas.addKeyframe(x, y);
+    this.canvas.onClick(x, y);
+  }
+
+  canvasRelease = () => {
+    this.canvas.onRelease();
   }
 
   handleHover = e => {
@@ -45,7 +49,8 @@ export class KeyframeEditor {
       <div
         class="keyframe-editor"
         ref={el => this.canvasContainer = el as HTMLDivElement}
-        onClick={this.addKeyframe}
+        onMouseDown={this.canvasClick}
+        onMouseUp={this.canvasRelease}
         onMouseMove={this.handleHover}
       >
         <canvas

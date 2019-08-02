@@ -2,9 +2,12 @@ import { h } from '@stencil/core';
 import Canvas from './canvas';
 export class KeyframeEditor {
     constructor() {
-        this.addKeyframe = e => {
+        this.canvasClick = e => {
             const { x, y } = this.getPos(e);
-            this.canvas.addKeyframe(x, y);
+            this.canvas.onClick(x, y);
+        };
+        this.canvasRelease = () => {
+            this.canvas.onRelease();
         };
         this.handleHover = e => {
             this.canvas.handleHover(this.getPos(e));
@@ -25,7 +28,7 @@ export class KeyframeEditor {
         this.canvas.draw();
     }
     render() {
-        return (h("div", { class: "keyframe-editor", ref: el => this.canvasContainer = el, onClick: this.addKeyframe, onMouseMove: this.handleHover },
+        return (h("div", { class: "keyframe-editor", ref: el => this.canvasContainer = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover },
             h("canvas", { width: "100%", height: "500%", ref: el => this.canvasElement = el })));
     }
     static get is() { return "keyframe-editor"; }

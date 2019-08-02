@@ -3,7 +3,8 @@ export declare class KeyframeEditor {
     private canvasElement?;
     private canvasContainer?;
     private canvas;
-    addKeyframe: (e: any) => void;
+    canvasClick: (e: any) => void;
+    canvasRelease: () => void;
     handleHover: (e: any) => void;
     getPos: (e: any) => {
         x: number;
