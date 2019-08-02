@@ -61,12 +61,14 @@ export default class Canvas {
     this.ctx.stroke();
   }
 
-  drawKeyframe(pos: Position) {
-    const distX = this.mousePos.x - pos.x;
-    const distY = this.mousePos.y - pos.y;
-    const dist = Math.sqrt(distX**2 + distY**2);
+  getDist(point: Position, circle: Position) {
+    const distX = point.x - circle.x;
+    const distY = point.y - circle.y;
+    return Math.sqrt(distX**2 + distY**2);
+  }
 
-    const isHovering = dist < 8;
+  drawKeyframe(pos: Position) {
+    const isHovering = this.getDist(this.mousePos, pos) < 8;
 
     this.ctx.beginPath();
     this.ctx.fillStyle = isHovering ? '#444' : 'grey'

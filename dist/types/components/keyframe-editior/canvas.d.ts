@@ -15,6 +15,7 @@ export default class Canvas {
     handleHover(mousePos: Position): void;
     addKeyframe(x: number, y: number): void;
     drawLine(): void;
+    getDist(point: Position, circle: Position): number;
     drawKeyframe(pos: Position): void;
 }
 export {};

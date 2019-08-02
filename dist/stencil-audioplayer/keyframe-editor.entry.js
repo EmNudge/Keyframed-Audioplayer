@@ -40,11 +40,13 @@ class Canvas {
         this.ctx.lineTo(this.width, prevPos.y);
         this.ctx.stroke();
     }
+    getDist(point, circle) {
+        const distX = point.x - circle.x;
+        const distY = point.y - circle.y;
+        return Math.sqrt(distX ** 2 + distY ** 2);
+    }
     drawKeyframe(pos) {
-        const distX = this.mousePos.x - pos.x;
-        const distY = this.mousePos.y - pos.y;
-        const dist = Math.sqrt(distX ** 2 + distY ** 2);
-        const isHovering = dist < 8;
+        const isHovering = this.getDist(this.mousePos, pos) < 8;
         this.ctx.beginPath();
         this.ctx.fillStyle = isHovering ? '#444' : 'grey';
         this.ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI);
