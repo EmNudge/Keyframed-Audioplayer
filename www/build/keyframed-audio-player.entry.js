@@ -8,11 +8,12 @@ class KeyframedAudioPlayer {
         this.currentTime = 0;
         this.duration = 1;
         this.updateTime = () => {
-            const percentage = this.currentTime / this.duration;
-            this.keyframeEditor.getAudioLevel(percentage).then(volume => {
-                this.audioFile.volume = volume;
-            });
             this.currentTime = this.audioFile.currentTime;
+        };
+        this.updateVolume = async () => {
+            const percentage = this.currentTime / this.duration;
+            const volume = await this.keyframeEditor.getAudioLevel(percentage);
+            this.audioFile.volume = volume;
         };
         this.togglePlay = () => {
             this.audioFile[this.isPlaying ? "play" : "pause"]();
@@ -33,7 +34,10 @@ class KeyframedAudioPlayer {
     }
     componentDidLoad() {
         this.audioFile = new Audio(this.url);
-        this.audioFile.addEventListener('timeupdate', this.updateTime);
+        this.audioFile.addEventListener('timeupdate', () => {
+            this.updateTime();
+            this.updateVolume();
+        });
         this.audioFile.addEventListener('ended', this.togglePlay);
         this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
     }

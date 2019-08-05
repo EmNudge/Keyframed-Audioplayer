@@ -20,19 +20,24 @@ export class KeyframedAudioPlayer {
 
   componentDidLoad() {
     this.audioFile = new Audio(this.url);
-    this.audioFile.addEventListener('timeupdate', this.updateTime)
-    this.audioFile.addEventListener('ended', this.togglePlay)
-    this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration)
+    this.audioFile.addEventListener('timeupdate', () => {
+      this.updateTime();
+      this.updateVolume();
+    });
+    this.audioFile.addEventListener('ended', this.togglePlay);
+    this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
   }
 
   updateTime = () => {
-    const percentage = this.currentTime / this.duration;
-    this.keyframeEditor.getAudioLevel(percentage).then(volume => {
-      this.audioFile.volume = volume;
-    });
-    
     this.currentTime = this.audioFile.currentTime;
   }
+
+  updateVolume = async () => {
+    const percentage = this.currentTime / this.duration;
+    const volume = await this.keyframeEditor.getAudioLevel(percentage);
+    this.audioFile.volume = volume;
+  }
+
 
   togglePlay = () => {
     this.audioFile[this.isPlaying ? "play" : "pause"]();

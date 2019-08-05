@@ -8,6 +8,7 @@ export declare class KeyframedAudioPlayer {
     private keyframeEditor?;
     componentDidLoad(): void;
     updateTime: () => void;
+    updateVolume: () => Promise<void>;
     togglePlay: () => void;
     handleTimeSeek: (e: any) => void;
     getTime: () => string;
