@@ -2,6 +2,10 @@ interface Position {
     x: number;
     y: number;
 }
+interface SurroundingPos {
+    prev: Position;
+    next: Position;
+}
 export default class Canvas {
     canvas: HTMLCanvasElement;
     width: number;
@@ -18,6 +22,7 @@ export default class Canvas {
     sortKeyframes(keyframes: any): any;
     getKeyframeIndex(pos: any): number;
     drawLine(): void;
+    getSurroundingKeyframes(xPos: number): SurroundingPos;
     getDist(point: Position, circle: Position): number;
     drawKeyframe(pos: Position): void;
 }

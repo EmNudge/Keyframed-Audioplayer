@@ -6,6 +6,7 @@ export class KeyframedAudioPlayer {
         this.currentTime = 0;
         this.duration = 1;
         this.updateTime = () => {
+            console.log(this.audioFile.volume, this.currentTime / this.duration);
             this.currentTime = this.audioFile.currentTime;
         };
         this.togglePlay = () => {

@@ -20,6 +20,14 @@ export class KeyframeEditor {
             };
         };
     }
+    async getAudioLevel(percentage) {
+        const num = this.canvasElement.width * percentage;
+        const { prev, next } = this.canvas.getSurroundingKeyframes(num);
+        const inBtwnPercentage = (num - prev.x) / (next.x - prev.x);
+        const variableVolume = next.y - prev.y;
+        const volume = prev.x + inBtwnPercentage * variableVolume;
+        return volume;
+    }
     componentDidLoad() {
         const { width, height } = this.canvasContainer.getBoundingClientRect();
         this.canvasElement.width = width;
@@ -56,6 +64,27 @@ export class KeyframeEditor {
             },
             "attribute": "open",
             "reflect": false
+        }
+    }; }
+    static get methods() { return {
+        "getAudioLevel": {
+            "complexType": {
+                "signature": "(percentage: number) => Promise<number>",
+                "parameters": [{
+                        "tags": [],
+                        "text": ""
+                    }],
+                "references": {
+                    "Promise": {
+                        "location": "global"
+                    }
+                },
+                "return": "Promise<number>"
+            },
+            "docs": {
+                "text": "",
+                "tags": []
+            }
         }
     }; }
 }

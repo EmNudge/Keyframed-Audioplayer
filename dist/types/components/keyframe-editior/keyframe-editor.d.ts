@@ -10,6 +10,7 @@ export declare class KeyframeEditor {
         x: number;
         y: number;
     };
+    getAudioLevel(percentage: number): Promise<number>;
     componentDidLoad(): void;
     render(): any;
 }

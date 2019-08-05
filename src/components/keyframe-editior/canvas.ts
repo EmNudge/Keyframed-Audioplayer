@@ -3,6 +3,11 @@ interface Position {
   y: number;
 }
 
+interface SurroundingPos {
+  prev: Position;
+  next: Position;
+}
+
 export default class Canvas {
   canvas: HTMLCanvasElement;
   width: number;
@@ -94,7 +99,35 @@ export default class Canvas {
     this.ctx.stroke();
   }
 
-  getDist(point: Position, circle: Position) {
+  getSurroundingKeyframes(xPos: number): SurroundingPos {
+    if (xPos < this.keyframes[0].x) {
+      return {
+        prev: { ...this.keyframes[0], x: 0 },
+        next: this.keyframes[0]
+      }
+    } else if (xPos > this.keyframes.slice(-1)[0].x) {
+      const lastKeyframe = this.keyframes.slice(-1)[0];
+      return {
+        prev: lastKeyframe,
+        next: { ...lastKeyframe, x: this.width }
+      }
+    }
+
+    const leftIndex = this.keyframes.reduce((accum, pos, index) => {
+      const currentDist = xPos - pos.x;
+      const accumDist = xPos - this.keyframes[accum].x;
+
+      if (accumDist < currentDist) return accum;
+      return index;
+    }, 0);
+
+    return {
+      prev: this.keyframes[leftIndex],
+      next: this.keyframes[leftIndex + 1]
+    }
+  }
+
+  getDist(point: Position, circle: Position): number {
     const distX = point.x - circle.x;
     const distY = point.y - circle.y;
     return Math.sqrt(distX**2 + distY**2);

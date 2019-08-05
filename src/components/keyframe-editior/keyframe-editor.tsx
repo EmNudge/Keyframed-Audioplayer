@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, Method, h } from '@stencil/core';
 import Canvas from './canvas'
 
 @Component({
@@ -33,6 +33,17 @@ export class KeyframeEditor {
       x: ~~(e.clientX - x),
       y: ~~(e.clientY - y)
     }
+  }
+
+  @Method()
+  async getAudioLevel(percentage: number): Promise<number> {
+    const num = this.canvasElement.width * percentage;
+    const { prev, next } = this.canvas.getSurroundingKeyframes(num);
+    const inBtwnPercentage = (num - prev.x) / (next.x - prev.x);
+    const variableVolume = next.y - prev.y;
+    const volume = prev.x + inBtwnPercentage * variableVolume;
+
+    return volume;
   }
 
   componentDidLoad() {

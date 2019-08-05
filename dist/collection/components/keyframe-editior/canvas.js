@@ -67,6 +67,32 @@ export default class Canvas {
         this.ctx.lineTo(this.width, prevPos.y);
         this.ctx.stroke();
     }
+    getSurroundingKeyframes(xPos) {
+        if (xPos < this.keyframes[0].x) {
+            return {
+                prev: Object.assign({}, this.keyframes[0], { x: 0 }),
+                next: this.keyframes[0]
+            };
+        }
+        else if (xPos > this.keyframes.slice(-1)[0].x) {
+            const lastKeyframe = this.keyframes.slice(-1)[0];
+            return {
+                prev: lastKeyframe,
+                next: Object.assign({}, lastKeyframe, { x: this.width })
+            };
+        }
+        const leftIndex = this.keyframes.reduce((accum, pos, index) => {
+            const currentDist = xPos - pos.x;
+            const accumDist = xPos - this.keyframes[accum].x;
+            if (accumDist < currentDist)
+                return accum;
+            return index;
+        }, 0);
+        return {
+            prev: this.keyframes[leftIndex],
+            next: this.keyframes[leftIndex + 1]
+        };
+    }
     getDist(point, circle) {
         const distX = point.x - circle.x;
         const distY = point.y - circle.y;

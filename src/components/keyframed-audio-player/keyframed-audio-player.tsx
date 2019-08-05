@@ -24,6 +24,7 @@ export class KeyframedAudioPlayer {
   }
 
   updateTime = () => {
+    console.log(this.audioFile.volume, this.currentTime / this.duration)
     this.currentTime = this.audioFile.currentTime;
   }
 

@@ -1,4 +1,4 @@
-import { r as registerInstance, h } from './chunk-f2536b62.js';
+import { r as registerInstance, h } from './chunk-e49b5c18.js';
 
 function getTimecode(seconds) {
     const minutesNum = Math.floor(seconds / 60);
@@ -15,6 +15,7 @@ class KeyframedAudioPlayer {
         this.currentTime = 0;
         this.duration = 1;
         this.updateTime = () => {
+            console.log(this.audioFile.volume, this.currentTime / this.duration);
             this.currentTime = this.audioFile.currentTime;
         };
         this.togglePlay = () => {
