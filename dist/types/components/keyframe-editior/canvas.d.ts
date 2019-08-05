@@ -14,17 +14,20 @@ export default class Canvas {
     keyframes: Position[];
     mousePos: Position;
     draggingIndex: number;
+    selectedIndex: number;
     constructor(canvas: HTMLCanvasElement);
     draw(): void;
     handleHover(mousePos: Position): void;
-    onClick(x: number, y: number): void;
+    onClick(mousePos: Position): void;
+    addKeyframe(pos: Position): void;
     onRelease(): void;
+    onDelete(): void;
     sortKeyframes(keyframes: any): any;
     getKeyframeIndex(pos: any): number;
     drawLine(): void;
     getFullKeyframes(): Position[];
     getSurroundingKeyframes(xPos: number): SurroundingPos;
     getDist(point: Position, circle: Position): number;
-    drawKeyframe(pos: Position): void;
+    drawKeyframe(pos: Position, index: number): void;
 }
 export {};

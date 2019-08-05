@@ -12,8 +12,8 @@ class Canvas {
     draw() {
         this.ctx.clearRect(0, 0, this.width, this.width);
         this.drawLine();
-        for (const pos of this.keyframes) {
-            this.drawKeyframe(pos);
+        for (const [index, pos] of this.keyframes.entries()) {
+            this.drawKeyframe(pos, index);
         }
         requestAnimationFrame(() => this.draw());
     }
@@ -24,23 +24,29 @@ class Canvas {
         this.keyframes = this.sortKeyframes(this.keyframes.map((pos, index) => this.draggingIndex !== index ? pos : mousePos));
         this.draggingIndex = this.getKeyframeIndex(mousePos);
     }
-    onClick(x, y) {
-        let draggingIndex = null;
+    onClick(mousePos) {
         for (const [index, pos] of this.keyframes.entries()) {
-            if (this.getDist({ x, y }, pos) >= 8)
+            if (this.getDist(mousePos, pos) >= 8)
                 continue;
-            draggingIndex = index;
+            this.selectedIndex = this.draggingIndex = index;
+            return;
         }
-        if (draggingIndex === null) {
-            this.keyframes = this.sortKeyframes([...this.keyframes, { x, y }]);
-            this.draggingIndex = this.getKeyframeIndex({ x, y });
-        }
-        else {
-            this.draggingIndex = draggingIndex;
-        }
+        this.addKeyframe(mousePos);
+    }
+    addKeyframe(pos) {
+        this.keyframes = this.sortKeyframes([...this.keyframes, pos]);
+        this.draggingIndex = this.selectedIndex = this.getKeyframeIndex(pos);
     }
     onRelease() {
         this.draggingIndex = null;
+    }
+    onDelete() {
+        if (this.selectedIndex === null)
+            return;
+        this.keyframes = this.keyframes.filter((_, index) => index !== this.selectedIndex);
+        if (this.selectedIndex > this.keyframes.length - 1 && this.keyframes.length) {
+            this.selectedIndex--;
+        }
     }
     sortKeyframes(keyframes) {
         return keyframes.sort((pos1, pos2) => pos1.x - pos2.x);
@@ -97,14 +103,15 @@ class Canvas {
         const distY = point.y - circle.y;
         return Math.sqrt(distX ** 2 + distY ** 2);
     }
-    drawKeyframe(pos) {
+    drawKeyframe(pos, index) {
         const isHovering = this.getDist(this.mousePos, pos) < 8;
+        const isSelected = index === this.selectedIndex;
         this.ctx.beginPath();
         this.ctx.fillStyle = isHovering ? '#444' : 'grey';
         this.ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.fillStyle = 'white';
+        this.ctx.fillStyle = isSelected ? 'coral' : 'white';
         this.ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI);
         this.ctx.fill();
     }
@@ -114,14 +121,18 @@ class KeyframeEditor {
     constructor(hostRef) {
         registerInstance(this, hostRef);
         this.canvasClick = e => {
-            const { x, y } = this.getPos(e);
-            this.canvas.onClick(x, y);
+            this.canvas.onClick(this.getPos(e));
         };
         this.canvasRelease = () => {
             this.canvas.onRelease();
         };
         this.handleHover = e => {
             this.canvas.handleHover(this.getPos(e));
+        };
+        this.handleKeyPress = e => {
+            if (e.key !== 'Backspace' && e.key !== 'Delete')
+                return;
+            this.canvas.onDelete();
         };
         this.getPos = e => {
             const { x, y } = e.target.getBoundingClientRect();
@@ -143,6 +154,7 @@ class KeyframeEditor {
         const { width, height } = this.canvasContainer.getBoundingClientRect();
         this.canvasElement.width = width;
         this.canvasElement.height = height;
+        window.addEventListener('keydown', this.handleKeyPress);
         this.canvas = new Canvas(this.canvasElement);
         this.canvas.draw();
     }

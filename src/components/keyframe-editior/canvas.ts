@@ -15,7 +15,9 @@ export default class Canvas {
   ctx: CanvasRenderingContext2D;
   keyframes: Position[];
   mousePos: Position;
+
   draggingIndex: number;
+  selectedIndex: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -29,8 +31,8 @@ export default class Canvas {
     this.ctx.clearRect(0, 0, this.width, this.width);
 
     this.drawLine();
-    for (const pos of this.keyframes) {
-      this.drawKeyframe(pos)
+    for (const [index, pos] of this.keyframes.entries()) {
+      this.drawKeyframe(pos, index)
     }
 
     requestAnimationFrame(() => this.draw())
@@ -46,23 +48,32 @@ export default class Canvas {
     this.draggingIndex = this.getKeyframeIndex(mousePos)
   }
 
-  onClick(x: number, y: number) {
-    let draggingIndex = null;
+  onClick(mousePos: Position) {
     for (const [index, pos] of this.keyframes.entries()) {
-      if (this.getDist({ x, y }, pos) >= 8) continue;
-      draggingIndex = index;
+      if (this.getDist(mousePos, pos) >= 8) continue;
+
+      this.selectedIndex = this.draggingIndex = index;
+      return;
     }
 
-    if (draggingIndex === null) {
-      this.keyframes = this.sortKeyframes([...this.keyframes, { x, y }]);
-      this.draggingIndex = this.getKeyframeIndex({ x, y })
-    } else {
-      this.draggingIndex = draggingIndex;
-    }
+    this.addKeyframe(mousePos);
+  }
+
+  addKeyframe(pos: Position) {
+    this.keyframes = this.sortKeyframes([...this.keyframes, pos]);
+    this.draggingIndex = this.selectedIndex = this.getKeyframeIndex(pos)
   }
 
   onRelease() {
     this.draggingIndex = null;
+  }
+
+  onDelete() {
+    if (this.selectedIndex === null) return;
+    this.keyframes = this.keyframes.filter((_, index) => index !== this.selectedIndex);
+    if (this.selectedIndex > this.keyframes.length - 1 && this.keyframes.length) {
+      this.selectedIndex--;
+    }
   }
 
   sortKeyframes(keyframes) {
@@ -129,16 +140,17 @@ export default class Canvas {
     return Math.sqrt(distX**2 + distY**2);
   }
 
-  drawKeyframe(pos: Position) {
+  drawKeyframe(pos: Position, index: number) {
     const isHovering = this.getDist(this.mousePos, pos) < 8;
+    const isSelected = index === this.selectedIndex;
 
     this.ctx.beginPath();
-    this.ctx.fillStyle = isHovering ? '#444' : 'grey'
+    this.ctx.fillStyle = isHovering ? '#444' : 'grey';
     this.ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI);
     this.ctx.fill();
 
     this.ctx.beginPath();
-    this.ctx.fillStyle = 'white'
+    this.ctx.fillStyle = isSelected ? 'coral' : 'white';
     this.ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI);
     this.ctx.fill();
   }

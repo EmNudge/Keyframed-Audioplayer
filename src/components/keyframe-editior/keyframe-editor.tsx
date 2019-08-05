@@ -16,8 +16,7 @@ export class KeyframeEditor {
   private canvas: Canvas;
 
   canvasClick = e => {
-    const { x, y } = this.getPos(e);
-    this.canvas.onClick(x, y);
+    this.canvas.onClick(this.getPos(e));
   }
 
   canvasRelease = () => {
@@ -26,6 +25,11 @@ export class KeyframeEditor {
 
   handleHover = e => {
     this.canvas.handleHover(this.getPos(e))
+  }
+
+  handleKeyPress = e => {
+    if (e.key !== 'Backspace' && e.key !== 'Delete') return;
+    this.canvas.onDelete();
   }
 
   getPos = e => {
@@ -53,8 +57,10 @@ export class KeyframeEditor {
 
   componentDidLoad() {
     const { width, height } = this.canvasContainer.getBoundingClientRect();
-    this.canvasElement.width = width
-    this.canvasElement.height = height
+    this.canvasElement.width = width;
+    this.canvasElement.height = height;
+
+    window.addEventListener('keydown', this.handleKeyPress);
 
     this.canvas = new Canvas(this.canvasElement);
     this.canvas.draw();

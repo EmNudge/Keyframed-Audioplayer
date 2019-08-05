@@ -6,6 +6,7 @@ export declare class KeyframeEditor {
     canvasClick: (e: any) => void;
     canvasRelease: () => void;
     handleHover: (e: any) => void;
+    handleKeyPress: (e: any) => void;
     getPos: (e: any) => {
         x: number;
         y: number;
