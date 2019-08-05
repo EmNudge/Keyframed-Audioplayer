@@ -1,4 +1,5 @@
 import { Component, Prop, Method, h } from '@stencil/core';
+import { mapRange } from '../../utils/utils'
 import Canvas from './canvas'
 
 @Component({
@@ -39,11 +40,15 @@ export class KeyframeEditor {
   async getAudioLevel(percentage: number): Promise<number> {
     const num = this.canvasElement.width * percentage;
     const { prev, next } = this.canvas.getSurroundingKeyframes(num);
-    const inBtwnPercentage = (num - prev.x) / (next.x - prev.x);
-    const variableVolume = next.y - prev.y;
-    const volume = prev.x + inBtwnPercentage * variableVolume;
+    const mappedHeight = mapRange(
+      num, 
+      { min: prev.x, max: next.x }, 
+      { min: prev.y, max: next.y }
+    );
+    const volume = mappedHeight / this.canvasElement.height;
 
-    return volume;
+    // inversing since we go bottom to top in the UI
+    return 1 - volume;
   }
 
   componentDidLoad() {

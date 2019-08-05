@@ -7,3 +7,18 @@ export function getTimecode(seconds: number) {
 
   return `${minutesStr}:${secondsStr}`;
 }
+
+interface Range {
+  min: number;
+  max: number;
+}
+
+export function mapRange(val: number, range1: Range, range2: Range): number {
+  const valueDelta = val - range1.min;
+  const range1Delta = range1.max - range1.min;
+  const percentage = valueDelta / range1Delta;
+
+  const range2Delta = range2.max - range2.min;
+  const mappedRange2Delta = percentage * range2Delta;
+  return mappedRange2Delta + range2.min;
+}

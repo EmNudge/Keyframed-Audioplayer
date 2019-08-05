@@ -22,6 +22,7 @@ export default class Canvas {
     sortKeyframes(keyframes: any): any;
     getKeyframeIndex(pos: any): number;
     drawLine(): void;
+    getFullKeyframes(): Position[];
     getSurroundingKeyframes(xPos: number): SurroundingPos;
     getDist(point: Position, circle: Position): number;
     drawKeyframe(pos: Position): void;

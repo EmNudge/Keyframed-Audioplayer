@@ -78,13 +78,11 @@ export default class Canvas {
   }
 
   drawLine() {
-    let prevPos: Position = {
-      x: 0,
-      y: this.keyframes.length ? this.keyframes[0].y : this.height / 2
-    };
+    const keyframes = this.getFullKeyframes();
+    let prevPos = keyframes[0];
 
     this.ctx.strokeStyle = '#aaa'
-    for (const pos of this.keyframes) {
+    for (const pos of keyframes.slice(1)) {
       this.ctx.beginPath();
       this.ctx.moveTo(prevPos.x, prevPos.y);
       this.ctx.lineTo(pos.x, pos.y);
@@ -92,38 +90,36 @@ export default class Canvas {
 
       prevPos = pos;
     }
+  }
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(prevPos.x, prevPos.y);
-    this.ctx.lineTo(this.width, prevPos.y);
-    this.ctx.stroke();
+  // gets keyframes including imaginary beginning and ending keyframes
+  getFullKeyframes(): Position[] {
+    const firstKeyframe = this.keyframes[0];
+    const lastKeyframe = this.keyframes[this.keyframes.length - 1];
+    const startY = firstKeyframe ? firstKeyframe.y : this.height / 2;
+    const endY = lastKeyframe ? lastKeyframe.y : this.height / 2;
+
+    return [
+      { x: 0, y: startY },
+      ...this.keyframes,
+      { x: this.width, y: endY}
+    ]
   }
 
   getSurroundingKeyframes(xPos: number): SurroundingPos {
-    if (xPos < this.keyframes[0].x) {
-      return {
-        prev: { ...this.keyframes[0], x: 0 },
-        next: this.keyframes[0]
-      }
-    } else if (xPos > this.keyframes.slice(-1)[0].x) {
-      const lastKeyframe = this.keyframes.slice(-1)[0];
-      return {
-        prev: lastKeyframe,
-        next: { ...lastKeyframe, x: this.width }
-      }
+    const keyframes = this.getFullKeyframes();
+
+    // array.prototype.reduce was looking weird, so switched to a for-loop
+    let leftIndex = 0;
+    for (const [index, pos] of keyframes.entries()) {
+      if (xPos <= pos.x) break;
+      const {x} = keyframes[leftIndex];
+      if (xPos - pos.x < xPos - x) leftIndex = index;
     }
 
-    const leftIndex = this.keyframes.reduce((accum, pos, index) => {
-      const currentDist = xPos - pos.x;
-      const accumDist = xPos - this.keyframes[accum].x;
-
-      if (accumDist < currentDist) return accum;
-      return index;
-    }, 0);
-
     return {
-      prev: this.keyframes[leftIndex],
-      next: this.keyframes[leftIndex + 1]
+      prev: keyframes[leftIndex],
+      next: keyframes[leftIndex + 1]
     }
   }
 

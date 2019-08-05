@@ -1,4 +1,5 @@
 import { r as registerInstance, h } from './chunk-e49b5c18.js';
+import { m as mapRange } from './chunk-3129caa9.js';
 
 class Canvas {
     constructor(canvas) {
@@ -52,47 +53,43 @@ class Canvas {
         }
     }
     drawLine() {
-        let prevPos = {
-            x: 0,
-            y: this.keyframes.length ? this.keyframes[0].y : this.height / 2
-        };
+        const keyframes = this.getFullKeyframes();
+        let prevPos = keyframes[0];
         this.ctx.strokeStyle = '#aaa';
-        for (const pos of this.keyframes) {
+        for (const pos of keyframes.slice(1)) {
             this.ctx.beginPath();
             this.ctx.moveTo(prevPos.x, prevPos.y);
             this.ctx.lineTo(pos.x, pos.y);
             this.ctx.stroke();
             prevPos = pos;
         }
-        this.ctx.beginPath();
-        this.ctx.moveTo(prevPos.x, prevPos.y);
-        this.ctx.lineTo(this.width, prevPos.y);
-        this.ctx.stroke();
+    }
+    // gets keyframes including imaginary beginning and ending keyframes
+    getFullKeyframes() {
+        const firstKeyframe = this.keyframes[0];
+        const lastKeyframe = this.keyframes[this.keyframes.length - 1];
+        const startY = firstKeyframe ? firstKeyframe.y : this.height / 2;
+        const endY = lastKeyframe ? lastKeyframe.y : this.height / 2;
+        return [
+            { x: 0, y: startY },
+            ...this.keyframes,
+            { x: this.width, y: endY }
+        ];
     }
     getSurroundingKeyframes(xPos) {
-        if (xPos < this.keyframes[0].x) {
-            return {
-                prev: Object.assign({}, this.keyframes[0], { x: 0 }),
-                next: this.keyframes[0]
-            };
+        const keyframes = this.getFullKeyframes();
+        // array.prototype.reduce was looking weird, so switched to a for-loop
+        let leftIndex = 0;
+        for (const [index, pos] of keyframes.entries()) {
+            if (xPos <= pos.x)
+                break;
+            const { x } = keyframes[leftIndex];
+            if (xPos - pos.x < xPos - x)
+                leftIndex = index;
         }
-        else if (xPos > this.keyframes.slice(-1)[0].x) {
-            const lastKeyframe = this.keyframes.slice(-1)[0];
-            return {
-                prev: lastKeyframe,
-                next: Object.assign({}, lastKeyframe, { x: this.width })
-            };
-        }
-        const leftIndex = this.keyframes.reduce((accum, pos, index) => {
-            const currentDist = xPos - pos.x;
-            const accumDist = xPos - this.keyframes[accum].x;
-            if (accumDist < currentDist)
-                return accum;
-            return index;
-        }, 0);
         return {
-            prev: this.keyframes[leftIndex],
-            next: this.keyframes[leftIndex + 1]
+            prev: keyframes[leftIndex],
+            next: keyframes[leftIndex + 1]
         };
     }
     getDist(point, circle) {
@@ -137,10 +134,10 @@ class KeyframeEditor {
     async getAudioLevel(percentage) {
         const num = this.canvasElement.width * percentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
-        const inBtwnPercentage = (num - prev.x) / (next.x - prev.x);
-        const variableVolume = next.y - prev.y;
-        const volume = prev.x + inBtwnPercentage * variableVolume;
-        return volume;
+        const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
+        const volume = mappedHeight / this.canvasElement.height;
+        // inversing since we go bottom to top in the UI
+        return 1 - volume;
     }
     componentDidLoad() {
         const { width, height } = this.canvasContainer.getBoundingClientRect();

@@ -6,7 +6,10 @@ export class KeyframedAudioPlayer {
         this.currentTime = 0;
         this.duration = 1;
         this.updateTime = () => {
-            console.log(this.audioFile.volume, this.currentTime / this.duration);
+            const percentage = this.currentTime / this.duration;
+            this.keyframeEditor.getAudioLevel(percentage).then(volume => {
+                this.audioFile.volume = volume;
+            });
             this.currentTime = this.audioFile.currentTime;
         };
         this.togglePlay = () => {
@@ -41,7 +44,7 @@ export class KeyframedAudioPlayer {
                     h("div", { class: (this.isPlaying ? "play" : "pause") + " btn", onClick: this.togglePlay })),
                 h("div", { class: "name" }, this.name),
                 h("div", { class: "time" }, this.getTime())),
-            h("keyframe-editor", { open: true }));
+            h("keyframe-editor", { ref: el => this.keyframeEditor = el, open: true }));
     }
     static get is() { return "keyframed-audio-player"; }
     static get encapsulation() { return "shadow"; }

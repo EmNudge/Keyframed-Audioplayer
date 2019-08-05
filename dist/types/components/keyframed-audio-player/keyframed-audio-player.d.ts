@@ -5,6 +5,7 @@ export declare class KeyframedAudioPlayer {
     currentTime: number;
     duration: number;
     audioFile: HTMLAudioElement;
+    private keyframeEditor?;
     componentDidLoad(): void;
     updateTime: () => void;
     togglePlay: () => void;

@@ -16,6 +16,8 @@ export class KeyframedAudioPlayer {
   @State() duration: number = 1;
   @State() audioFile: HTMLAudioElement;
 
+  private keyframeEditor?: HTMLKeyframeEditorElement;
+
   componentDidLoad() {
     this.audioFile = new Audio(this.url);
     this.audioFile.addEventListener('timeupdate', this.updateTime)
@@ -24,7 +26,11 @@ export class KeyframedAudioPlayer {
   }
 
   updateTime = () => {
-    console.log(this.audioFile.volume, this.currentTime / this.duration)
+    const percentage = this.currentTime / this.duration;
+    this.keyframeEditor.getAudioLevel(percentage).then(volume => {
+      this.audioFile.volume = volume;
+    });
+    
     this.currentTime = this.audioFile.currentTime;
   }
 
@@ -62,7 +68,10 @@ export class KeyframedAudioPlayer {
           {this.getTime()}
         </div>
       </div>
-      <keyframe-editor open={true}></keyframe-editor>
+      <keyframe-editor 
+        ref={el => this.keyframeEditor = el as HTMLKeyframeEditorElement} 
+        open={true}
+      ></keyframe-editor>
     </div>;
   }
 }
