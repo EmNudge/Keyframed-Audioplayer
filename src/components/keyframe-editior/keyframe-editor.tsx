@@ -1,5 +1,5 @@
-import { Component, Prop, Method, h } from '@stencil/core';
-import { mapRange } from '../../utils/utils'
+import { Component, Prop, State, Method, h } from '@stencil/core';
+import { mapRange, getClass } from '../../utils/utils'
 import Canvas from './canvas'
 
 @Component({
@@ -10,6 +10,7 @@ import Canvas from './canvas'
 
 export class KeyframeEditor {
   @Prop() open: boolean;
+  @State() isCollapsed: boolean = false;
 
   private canvasElement?: HTMLCanvasElement;
   private canvasContainer?: HTMLDivElement;
@@ -38,6 +39,11 @@ export class KeyframeEditor {
       x: ~~(e.clientX - x),
       y: ~~(e.clientY - y)
     }
+  }
+
+  collapseToggle = () => {
+    console.log('previously was:', this.isCollapsed)
+    this.isCollapsed = !this.isCollapsed;
   }
 
   @Method()
@@ -69,17 +75,25 @@ export class KeyframeEditor {
   render() {
     return (
       <div
-        class="keyframe-editor"
-        ref={el => this.canvasContainer = el as HTMLDivElement}
-        onMouseDown={this.canvasClick}
-        onMouseUp={this.canvasRelease}
-        onMouseMove={this.handleHover}
+        class={getClass("keyframe-editor", {collapsed: this.isCollapsed})}
       >
-        <canvas
-          width="100%"
-          height="500%"
-          ref={el => this.canvasElement = el as HTMLCanvasElement}
-        />
+        <div 
+          class={getClass("canvas-container", {collapsed: this.isCollapsed})}
+          ref={el => this.canvasContainer = el as HTMLDivElement}
+        >
+          <canvas
+            ref={el => this.canvasElement = el as HTMLCanvasElement}
+            onMouseDown={this.canvasClick}
+            onMouseUp={this.canvasRelease}
+            onMouseMove={this.handleHover}
+          />
+        </div>
+        <div 
+          class={getClass("expand-contract-toggle", {collapsed: this.isCollapsed})}
+          onClick={this.collapseToggle}
+        >
+          <span>&lt;</span>
+        </div>
       </div>
     )
   }

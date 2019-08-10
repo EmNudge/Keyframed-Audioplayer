@@ -1,5 +1,38 @@
 .keyframe-editor {
-  height: 50px;
-  background: rgb(226, 226, 226);
+  --canvas-height: 50px;
+  --btn-height: 10px;
+  height: calc(var(--canvas-height) + var(--btn-height));
   cursor: pointer;
+  transition: .5s;
+}
+.keyframe-editor.collapsed {
+  height: 10px;
+}
+
+
+.canvas-container {
+  height: var(--canvas-height);
+  overflow: hidden;
+  background: rgb(226, 226, 226);
+  transition: .5s;
+}
+.canvas-container.collapsed {
+  height: 0px;
+}
+
+
+.expand-contract-toggle {
+  height: var(--btn-height);
+  background: rgb(32, 33, 44);
+  display: flex;
+  justify-content: center;
+}
+.expand-contract-toggle span {
+  user-select: none;
+  display: block;
+  transform: rotate(90deg) scale(.5, 1);
+  transition: .5s;
+}
+.expand-contract-toggle.collapsed span {
+  transform: rotate(90deg) scale(-.5, 1);
 }

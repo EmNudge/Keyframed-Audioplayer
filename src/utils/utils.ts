@@ -8,6 +8,17 @@ export function getTimecode(seconds: number) {
   return `${minutesStr}:${secondsStr}`;
 }
 
+export function getClass(...classes: any) {
+  return classes.flatMap(className => {
+    if (typeof className === "string") return [className];
+    const classNamesArr = [];
+    for (const prop in className) {
+      if (className[prop]) classNamesArr.push(prop);
+    }
+    return classNamesArr;
+  }).join(' ');
+}
+
 interface Range {
   min: number;
   max: number;

@@ -1,5 +1,5 @@
 import { r as registerInstance, h } from './chunk-e49b5c18.js';
-import { g as getTimecode } from './chunk-3129caa9.js';
+import { a as getTimecode } from './chunk-c03825d1.js';
 
 class KeyframedAudioPlayer {
     constructor(hostRef) {

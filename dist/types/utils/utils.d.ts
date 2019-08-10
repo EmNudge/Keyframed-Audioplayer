@@ -1,4 +1,5 @@
 export declare function getTimecode(seconds: number): string;
+export declare function getClass(...classes: any): any;
 interface Range {
     min: number;
     max: number;

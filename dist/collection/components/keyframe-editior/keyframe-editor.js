@@ -1,8 +1,9 @@
 import { h } from '@stencil/core';
-import { mapRange } from '../../utils/utils';
+import { mapRange, getClass } from '../../utils/utils';
 import Canvas from './canvas';
 export class KeyframeEditor {
     constructor() {
+        this.isCollapsed = false;
         this.canvasClick = e => {
             this.canvas.onClick(this.getPos(e));
         };
@@ -24,6 +25,10 @@ export class KeyframeEditor {
                 y: ~~(e.clientY - y)
             };
         };
+        this.collapseToggle = () => {
+            console.log('previously was:', this.isCollapsed);
+            this.isCollapsed = !this.isCollapsed;
+        };
     }
     async getHeightPercentage(widthPercentage) {
         const num = this.canvasElement.width * widthPercentage;
@@ -42,8 +47,11 @@ export class KeyframeEditor {
         this.canvas.draw();
     }
     render() {
-        return (h("div", { class: "keyframe-editor", ref: el => this.canvasContainer = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover },
-            h("canvas", { width: "100%", height: "500%", ref: el => this.canvasElement = el })));
+        return (h("div", { class: getClass("keyframe-editor", { collapsed: this.isCollapsed }) },
+            h("div", { class: getClass("canvas-container", { collapsed: this.isCollapsed }), ref: el => this.canvasContainer = el },
+                h("canvas", { ref: el => this.canvasElement = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover })),
+            h("div", { class: getClass("expand-contract-toggle", { collapsed: this.isCollapsed }), onClick: this.collapseToggle },
+                h("span", null, "<"))));
     }
     static get is() { return "keyframe-editor"; }
     static get encapsulation() { return "shadow"; }
@@ -71,6 +79,9 @@ export class KeyframeEditor {
             "attribute": "open",
             "reflect": false
         }
+    }; }
+    static get states() { return {
+        "isCollapsed": {}
     }; }
     static get methods() { return {
         "getHeightPercentage": {

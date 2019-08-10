@@ -1,5 +1,6 @@
 export declare class KeyframeEditor {
     open: boolean;
+    isCollapsed: boolean;
     private canvasElement?;
     private canvasContainer?;
     private canvas;
@@ -11,6 +12,7 @@ export declare class KeyframeEditor {
         x: number;
         y: number;
     };
+    collapseToggle: () => void;
     getHeightPercentage(widthPercentage: number): Promise<number>;
     componentDidLoad(): void;
     render(): any;

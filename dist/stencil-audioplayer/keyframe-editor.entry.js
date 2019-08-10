@@ -1,5 +1,5 @@
 import { r as registerInstance, h } from './chunk-e49b5c18.js';
-import { m as mapRange } from './chunk-3129caa9.js';
+import { m as mapRange, g as getClass } from './chunk-c03825d1.js';
 
 class Canvas {
     constructor(canvas) {
@@ -126,6 +126,7 @@ class Canvas {
 class KeyframeEditor {
     constructor(hostRef) {
         registerInstance(this, hostRef);
+        this.isCollapsed = false;
         this.canvasClick = e => {
             this.canvas.onClick(this.getPos(e));
         };
@@ -147,6 +148,10 @@ class KeyframeEditor {
                 y: ~~(e.clientY - y)
             };
         };
+        this.collapseToggle = () => {
+            console.log('previously was:', this.isCollapsed);
+            this.isCollapsed = !this.isCollapsed;
+        };
     }
     async getHeightPercentage(widthPercentage) {
         const num = this.canvasElement.width * widthPercentage;
@@ -165,9 +170,9 @@ class KeyframeEditor {
         this.canvas.draw();
     }
     render() {
-        return (h("div", { class: "keyframe-editor", ref: el => this.canvasContainer = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover }, h("canvas", { width: "100%", height: "500%", ref: el => this.canvasElement = el })));
+        return (h("div", { class: getClass("keyframe-editor", { collapsed: this.isCollapsed }) }, h("div", { class: getClass("canvas-container", { collapsed: this.isCollapsed }), ref: el => this.canvasContainer = el }, h("canvas", { ref: el => this.canvasElement = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover })), h("div", { class: getClass("expand-contract-toggle", { collapsed: this.isCollapsed }), onClick: this.collapseToggle }, h("span", null, "<"))));
     }
-    static get style() { return ".keyframe-editor {\n  height: 50px;\n  background: rgb(226, 226, 226);\n  cursor: pointer;\n}"; }
+    static get style() { return ".keyframe-editor {\n  --canvas-height: 50px;\n  --btn-height: 10px;\n  height: calc(var(--canvas-height) + var(--btn-height));\n  cursor: pointer;\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.keyframe-editor.collapsed {\n  height: 10px;\n}\n\n\n.canvas-container {\n  height: var(--canvas-height);\n  overflow: hidden;\n  background: rgb(226, 226, 226);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.canvas-container.collapsed {\n  height: 0px;\n}\n\n\n.expand-contract-toggle {\n  height: var(--btn-height);\n  background: rgb(32, 33, 44);\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: center;\n  justify-content: center;\n}\n.expand-contract-toggle span {\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  display: block;\n  -webkit-transform: rotate(90deg) scale(.5, 1);\n  transform: rotate(90deg) scale(.5, 1);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.expand-contract-toggle.collapsed span {\n  -webkit-transform: rotate(90deg) scale(-.5, 1);\n  transform: rotate(90deg) scale(-.5, 1);\n}"; }
 }
 
 export { KeyframeEditor as keyframe_editor };
