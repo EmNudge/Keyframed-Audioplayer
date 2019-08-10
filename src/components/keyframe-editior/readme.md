@@ -12,6 +12,19 @@
 | `open`   | `open`    |             | `boolean` | `undefined` |
 
 
+## Methods
+
+### `getHeightPercentage(widthPercentage: number) => Promise<number>`
+
+
+
+#### Returns
+
+Type: `Promise<number>`
+
+
+
+
 ## Dependencies
 
 ### Used by

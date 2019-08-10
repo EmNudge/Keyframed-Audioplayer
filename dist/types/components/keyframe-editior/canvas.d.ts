@@ -27,10 +27,10 @@ export default class Canvas {
     addKeyframe(pos: Position): void;
     onRelease(): void;
     onDelete(): void;
-    sortKeyframes(keyframes: any): any;
+    sortKeyframes(keyframes: Keyframe[]): Keyframe[];
     getKeyframeIndex(id: symbol): number;
     drawLine(): void;
-    getFullKeyframes(): Position[];
+    getFullKeyframes(): Keyframe[];
     getSurroundingKeyframes(xPos: number): SurroundingPos;
     getDist(point: Position, circle: Position | Keyframe): number;
     drawKeyframe(keyframe: Keyframe): void;

@@ -40,13 +40,17 @@ class Canvas {
     onRelease() {
         this.draggedId = null;
     }
+    // removes keyframe and reassigns selectedId if any id is selected
     onDelete() {
         if (this.selectedId === null)
             return;
-        // get index from ID
         const selectedIndex = this.getKeyframeIndex(this.selectedId);
-        // remove selected keyframe
         this.keyframes = this.keyframes.filter(keyframe => keyframe.id !== this.selectedId);
+        // if no more keyframes, set selectedId to null and return
+        if (!this.keyframes.length) {
+            this.selectedId = null;
+            return;
+        }
         // change selected ID
         const newIndex = this.keyframes.length > selectedIndex ? selectedIndex : selectedIndex - 1;
         this.selectedId = this.keyframes[newIndex].id;
@@ -79,9 +83,9 @@ class Canvas {
         const startY = firstKeyframe ? firstKeyframe.y : this.height / 2;
         const endY = lastKeyframe ? lastKeyframe.y : this.height / 2;
         return [
-            { x: 0, y: startY },
+            { x: 0, y: startY, id: Symbol('start') },
             ...this.keyframes,
-            { x: this.width, y: endY }
+            { x: this.width, y: endY, id: Symbol('end') }
         ];
     }
     getSurroundingKeyframes(xPos) {
@@ -144,13 +148,13 @@ class KeyframeEditor {
             };
         };
     }
-    async getAudioLevel(percentage) {
-        const num = this.canvasElement.width * percentage;
+    async getHeightPercentage(widthPercentage) {
+        const num = this.canvasElement.width * widthPercentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
         const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
-        const volume = mappedHeight / this.canvasElement.height;
+        const heightPercentage = mappedHeight / this.canvasElement.height;
         // inversing since we go bottom to top in the UI
-        return 1 - volume;
+        return 1 - heightPercentage;
     }
     componentDidLoad() {
         const { width, height } = this.canvasContainer.getBoundingClientRect();

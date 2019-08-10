@@ -10,7 +10,7 @@ import { HTMLStencilElement, JSXBase } from './stencil.core';
 
 export namespace Components {
   interface KeyframeEditor {
-    'getAudioLevel': (percentage: number) => Promise<number>;
+    'getHeightPercentage': (widthPercentage: number) => Promise<number>;
     'open': boolean;
   }
   interface KeyframedAudioPlayer {

@@ -75,21 +75,24 @@ export default class Canvas {
     this.draggedId = null;
   }
 
+  // removes keyframe and reassigns selectedId if any id is selected
   onDelete() {
     if (this.selectedId === null) return;
 
-    // get index from ID
     const selectedIndex = this.getKeyframeIndex(this.selectedId);
-    // remove selected keyframe
     this.keyframes = this.keyframes.filter(keyframe => keyframe.id !== this.selectedId);
+
+    // if no more keyframes, set selectedId to null and return
+    if (!this.keyframes.length){
+      this.selectedId = null;
+      return;
+    }
     // change selected ID
     const newIndex =  this.keyframes.length > selectedIndex ? selectedIndex : selectedIndex - 1; 
     this.selectedId = this.keyframes[newIndex].id;
   }
 
-
-
-  sortKeyframes(keyframes) {
+  sortKeyframes(keyframes: Keyframe[]): Keyframe[] {
     return keyframes.sort((pos1, pos2) => pos1.x - pos2.x)
   }
 
@@ -115,16 +118,16 @@ export default class Canvas {
   }
 
   // gets keyframes including imaginary beginning and ending keyframes
-  getFullKeyframes(): Position[] {
+  getFullKeyframes(): Keyframe[] {
     const firstKeyframe = this.keyframes[0];
     const lastKeyframe = this.keyframes[this.keyframes.length - 1];
     const startY = firstKeyframe ? firstKeyframe.y : this.height / 2;
     const endY = lastKeyframe ? lastKeyframe.y : this.height / 2;
 
     return [
-      { x: 0, y: startY },
+      { x: 0, y: startY, id: Symbol('start') },
       ...this.keyframes,
-      { x: this.width, y: endY}
+      { x: this.width, y: endY, id: Symbol('end')}
     ]
   }
 

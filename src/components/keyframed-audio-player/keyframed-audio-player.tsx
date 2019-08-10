@@ -34,7 +34,7 @@ export class KeyframedAudioPlayer {
 
   updateVolume = async () => {
     const percentage = this.currentTime / this.duration;
-    const volume = await this.keyframeEditor.getAudioLevel(percentage);
+    const volume = await this.keyframeEditor.getHeightPercentage(percentage);
     this.audioFile.volume = volume;
   }
 

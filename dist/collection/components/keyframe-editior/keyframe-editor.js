@@ -25,13 +25,13 @@ export class KeyframeEditor {
             };
         };
     }
-    async getAudioLevel(percentage) {
-        const num = this.canvasElement.width * percentage;
+    async getHeightPercentage(widthPercentage) {
+        const num = this.canvasElement.width * widthPercentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
         const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
-        const volume = mappedHeight / this.canvasElement.height;
+        const heightPercentage = mappedHeight / this.canvasElement.height;
         // inversing since we go bottom to top in the UI
-        return 1 - volume;
+        return 1 - heightPercentage;
     }
     componentDidLoad() {
         const { width, height } = this.canvasContainer.getBoundingClientRect();
@@ -73,9 +73,9 @@ export class KeyframeEditor {
         }
     }; }
     static get methods() { return {
-        "getAudioLevel": {
+        "getHeightPercentage": {
             "complexType": {
-                "signature": "(percentage: number) => Promise<number>",
+                "signature": "(widthPercentage: number) => Promise<number>",
                 "parameters": [{
                         "tags": [],
                         "text": ""
