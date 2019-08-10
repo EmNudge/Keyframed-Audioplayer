@@ -12,50 +12,52 @@ class Canvas {
     draw() {
         this.ctx.clearRect(0, 0, this.width, this.width);
         this.drawLine();
-        for (const [index, pos] of this.keyframes.entries()) {
-            this.drawKeyframe(pos, index);
+        for (const keyframe of this.keyframes) {
+            this.drawKeyframe(keyframe);
         }
         requestAnimationFrame(() => this.draw());
     }
     handleHover(mousePos) {
         this.mousePos = mousePos;
-        if (this.draggingIndex === null)
+        if (this.draggedId === null)
             return;
-        this.keyframes = this.sortKeyframes(this.keyframes.map((pos, index) => this.draggingIndex !== index ? pos : mousePos));
-        this.draggingIndex = this.getKeyframeIndex(mousePos);
+        this.keyframes = this.sortKeyframes(this.keyframes.map(keyframe => this.draggedId === keyframe.id ? Object.assign({}, mousePos, { id: keyframe.id }) : keyframe));
     }
     onClick(mousePos) {
-        for (const [index, pos] of this.keyframes.entries()) {
-            if (this.getDist(mousePos, pos) >= 8)
+        for (const keyframe of this.keyframes) {
+            if (this.getDist(mousePos, keyframe) >= 8)
                 continue;
-            this.selectedIndex = this.draggingIndex = index;
+            this.selectedId = this.draggedId = keyframe.id;
             return;
         }
         this.addKeyframe(mousePos);
     }
     addKeyframe(pos) {
-        this.keyframes = this.sortKeyframes([...this.keyframes, pos]);
-        this.draggingIndex = this.selectedIndex = this.getKeyframeIndex(pos);
+        const keyframe = Object.assign({}, pos, { id: Symbol() });
+        this.keyframes = this.sortKeyframes([...this.keyframes, keyframe]);
+        this.draggedId = this.selectedId = keyframe.id;
     }
     onRelease() {
-        this.draggingIndex = null;
+        this.draggedId = null;
     }
     onDelete() {
-        if (this.selectedIndex === null)
+        if (this.selectedId === null)
             return;
-        this.keyframes = this.keyframes.filter((_, index) => index !== this.selectedIndex);
-        if (this.selectedIndex > this.keyframes.length - 1 && this.keyframes.length) {
-            this.selectedIndex--;
-        }
+        // get index from ID
+        const selectedIndex = this.getKeyframeIndex(this.selectedId);
+        // remove selected keyframe
+        this.keyframes = this.keyframes.filter(keyframe => keyframe.id !== this.selectedId);
+        // change selected ID
+        const newIndex = this.keyframes.length > selectedIndex ? selectedIndex : selectedIndex - 1;
+        this.selectedId = this.keyframes[newIndex].id;
     }
     sortKeyframes(keyframes) {
         return keyframes.sort((pos1, pos2) => pos1.x - pos2.x);
     }
-    getKeyframeIndex(pos) {
-        for (const [index, pos1] of this.keyframes.entries()) {
-            if (pos1.x === pos.x && pos1.y === pos.y) {
+    getKeyframeIndex(id) {
+        for (const [index, keyframe] of this.keyframes.entries()) {
+            if (keyframe.id === id)
                 return index;
-            }
         }
     }
     drawLine() {
@@ -103,16 +105,16 @@ class Canvas {
         const distY = point.y - circle.y;
         return Math.sqrt(distX ** 2 + distY ** 2);
     }
-    drawKeyframe(pos, index) {
-        const isHovering = this.getDist(this.mousePos, pos) < 8;
-        const isSelected = index === this.selectedIndex;
+    drawKeyframe(keyframe) {
+        const isHovering = this.getDist(this.mousePos, keyframe) < 8;
+        const isSelected = keyframe.id === this.selectedId;
         this.ctx.beginPath();
         this.ctx.fillStyle = isHovering ? '#444' : 'grey';
-        this.ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI);
+        this.ctx.arc(keyframe.x, keyframe.y, 8, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.beginPath();
         this.ctx.fillStyle = isSelected ? 'coral' : 'white';
-        this.ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI);
+        this.ctx.arc(keyframe.x, keyframe.y, 4, 0, 2 * Math.PI);
         this.ctx.fill();
     }
 }
