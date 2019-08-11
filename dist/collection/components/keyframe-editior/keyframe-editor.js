@@ -1,4 +1,4 @@
-import { h } from '@stencil/core';
+import { h } from "@stencil/core";
 import { mapRange, getClass } from '../../utils/utils';
 import Canvas from './canvas';
 export class KeyframeEditor {

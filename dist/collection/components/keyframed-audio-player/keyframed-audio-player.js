@@ -1,4 +1,4 @@
-import { h } from '@stencil/core';
+import { h } from "@stencil/core";
 import { getTimecode } from '../../utils/utils';
 export class KeyframedAudioPlayer {
     constructor() {
@@ -33,8 +33,15 @@ export class KeyframedAudioPlayer {
         };
     }
     componentDidUpdate() {
-        if (!this.audioFile || this.audioFile.src !== this.url)
+        if (!this.audioFile) {
             this.initializeAudio();
+            return;
+        }
+        if (this.audioFile.src !== this.url) {
+            if (!this.isPlaying)
+                this.togglePlay();
+            this.initializeAudio();
+        }
     }
     initializeAudio() {
         this.audioFile = new Audio(this.url);
@@ -44,6 +51,7 @@ export class KeyframedAudioPlayer {
         });
         this.audioFile.addEventListener('ended', this.togglePlay);
         this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
+        this.updateTime();
     }
     render() {
         return h("div", { class: "audioplayer" },

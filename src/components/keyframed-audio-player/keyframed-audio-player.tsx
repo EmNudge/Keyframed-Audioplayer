@@ -19,7 +19,14 @@ export class KeyframedAudioPlayer {
   private keyframeEditor?: HTMLKeyframeEditorElement;
 
   componentDidUpdate() {
-    if (!this.audioFile || this.audioFile.src !== this.url) this.initializeAudio()
+    if (!this.audioFile) {
+      this.initializeAudio()
+      return;
+    }
+    if (this.audioFile.src !== this.url) {
+      if (!this.isPlaying) this.togglePlay();
+      this.initializeAudio();
+    }
   }
 
   initializeAudio() {
@@ -30,6 +37,7 @@ export class KeyframedAudioPlayer {
     });
     this.audioFile.addEventListener('ended', this.togglePlay);
     this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
+    this.updateTime();
   }
 
   updateTime = () => {
@@ -71,8 +79,8 @@ export class KeyframedAudioPlayer {
       </div>
       <div class="body">
         <div class={"play-container" + (!this.audioFile ? " disabled" : "")}>
-          <div 
-            class={(this.isPlaying ? "play" : "pause") + " btn"} 
+          <div
+            class={(this.isPlaying ? "play" : "pause") + " btn"}
             onClick={this.togglePlay}
           />
         </div>
@@ -81,8 +89,8 @@ export class KeyframedAudioPlayer {
           {this.getTime()}
         </div>
       </div>
-      <keyframe-editor 
-        ref={el => this.keyframeEditor = el as HTMLKeyframeEditorElement} 
+      <keyframe-editor
+        ref={el => this.keyframeEditor = el as HTMLKeyframeEditorElement}
         open={true}
       ></keyframe-editor>
     </div>;
