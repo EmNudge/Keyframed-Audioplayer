@@ -4,7 +4,7 @@ export class KeyframedAudioPlayer {
     constructor() {
         this.isPlaying = true;
         this.currentTime = 0;
-        this.duration = 1;
+        this.duration = 0;
         this.updateTime = () => {
             this.currentTime = this.audioFile.currentTime;
         };
@@ -14,6 +14,8 @@ export class KeyframedAudioPlayer {
             this.audioFile.volume = volume;
         };
         this.togglePlay = () => {
+            if (!this.audioFile)
+                return;
             this.audioFile[this.isPlaying ? "play" : "pause"]();
             this.isPlaying = !this.isPlaying;
         };
@@ -30,7 +32,11 @@ export class KeyframedAudioPlayer {
             return this.currentTime / this.duration * 100 + '%';
         };
     }
-    componentDidLoad() {
+    componentDidUpdate() {
+        if (!this.audioFile || this.audioFile.src !== this.url)
+            this.initializeAudio();
+    }
+    initializeAudio() {
         this.audioFile = new Audio(this.url);
         this.audioFile.addEventListener('timeupdate', () => {
             this.updateTime();
@@ -44,9 +50,9 @@ export class KeyframedAudioPlayer {
             h("div", { class: "timeline", onClick: this.handleTimeSeek },
                 h("div", { class: "progress-bar", style: { width: this.getWidth() } })),
             h("div", { class: "body" },
-                h("div", { class: "play-container" },
+                h("div", { class: "play-container" + (!this.audioFile ? " disabled" : "") },
                     h("div", { class: (this.isPlaying ? "play" : "pause") + " btn", onClick: this.togglePlay })),
-                h("div", { class: "name" }, this.name),
+                h("div", { class: "name" }, this.name || "Unknown Song"),
                 h("div", { class: "time" }, this.getTime())),
             h("keyframe-editor", { ref: el => this.keyframeEditor = el, open: true }));
     }

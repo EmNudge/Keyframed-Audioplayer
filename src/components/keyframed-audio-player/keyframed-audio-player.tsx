@@ -13,12 +13,16 @@ export class KeyframedAudioPlayer {
 
   @State() isPlaying: boolean = true;
   @State() currentTime: number = 0;
-  @State() duration: number = 1;
+  @State() duration: number = 0;
   @State() audioFile: HTMLAudioElement;
 
   private keyframeEditor?: HTMLKeyframeEditorElement;
 
-  componentDidLoad() {
+  componentDidUpdate() {
+    if (!this.audioFile || this.audioFile.src !== this.url) this.initializeAudio()
+  }
+
+  initializeAudio() {
     this.audioFile = new Audio(this.url);
     this.audioFile.addEventListener('timeupdate', () => {
       this.updateTime();
@@ -40,6 +44,7 @@ export class KeyframedAudioPlayer {
 
 
   togglePlay = () => {
+    if (!this.audioFile) return;
     this.audioFile[this.isPlaying ? "play" : "pause"]();
     this.isPlaying = !this.isPlaying;
   }
@@ -65,10 +70,13 @@ export class KeyframedAudioPlayer {
         <div class="progress-bar" style={{width: this.getWidth()}}></div>
       </div>
       <div class="body">
-        <div class="play-container">
-          <div class={(this.isPlaying ? "play" : "pause") + " btn"} onClick={this.togglePlay}></div>
+        <div class={"play-container" + (!this.audioFile ? " disabled" : "")}>
+          <div 
+            class={(this.isPlaying ? "play" : "pause") + " btn"} 
+            onClick={this.togglePlay}
+          />
         </div>
-        <div class="name">{this.name}</div>
+        <div class="name">{this.name || "Unknown Song"}</div>
         <div class="time">
           {this.getTime()}
         </div>

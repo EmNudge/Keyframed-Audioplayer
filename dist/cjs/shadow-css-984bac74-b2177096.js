@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -398,4 +400,5 @@ function escapeBlocks(input) {
     return new StringWithEscapedBlocks(resultParts.join(''), escapedBlocks);
 }
 
-export { ShadowCss, scopeCss };
+exports.ShadowCss = ShadowCss;
+exports.scopeCss = scopeCss;

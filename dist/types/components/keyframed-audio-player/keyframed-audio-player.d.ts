@@ -6,7 +6,8 @@ export declare class KeyframedAudioPlayer {
     duration: number;
     audioFile: HTMLAudioElement;
     private keyframeEditor?;
-    componentDidLoad(): void;
+    componentDidUpdate(): void;
+    initializeAudio(): void;
     updateTime: () => void;
     updateVolume: () => Promise<void>;
     togglePlay: () => void;

@@ -1,6 +1,1 @@
-import { p as patchBrowser, g as globals, b as bootstrapLazy } from './chunk-e49b5c18.js';
-
-patchBrowser().then(resourcesUrl => {
-  globals();
-  return bootstrapLazy([["keyframe-editor",[[1,"keyframe-editor",{"open":[4],"isCollapsed":[32],"getHeightPercentage":[64]}]]],["keyframed-audio-player",[[1,"keyframed-audio-player",{"name":[1],"url":[1],"isPlaying":[32],"currentTime":[32],"duration":[32],"audioFile":[32]}]]]], { resourcesUrl });
-});
+import{p as e,b as r}from"./p-70644ef7.js";e().then(e=>r([["p-ocjx2n8h",[[1,"keyframed-audio-player",{name:[1],url:[1],isPlaying:[32],currentTime:[32],duration:[32],audioFile:[32]}],[1,"keyframe-editor",{open:[4],isCollapsed:[32],getHeightPercentage:[64]}]]]],{resourcesUrl:e}));

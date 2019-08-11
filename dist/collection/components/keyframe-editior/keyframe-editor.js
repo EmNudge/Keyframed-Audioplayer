@@ -26,7 +26,6 @@ export class KeyframeEditor {
             };
         };
         this.collapseToggle = () => {
-            console.log('previously was:', this.isCollapsed);
             this.isCollapsed = !this.isCollapsed;
         };
     }

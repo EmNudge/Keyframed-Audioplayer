@@ -1,5 +1,32 @@
-import { r as registerInstance, h } from './chunk-e49b5c18.js';
-import { m as mapRange, g as getClass } from './chunk-c03825d1.js';
+import { r as registerInstance, h } from './chunk-10dd6b23.js';
+
+function getTimecode(seconds) {
+    const minutesNum = Math.floor(seconds / 60);
+    const minutesStr = String(minutesNum).padStart(2, "0");
+    const secondsNum = Math.floor(seconds - minutesNum * 60);
+    const secondsStr = String(secondsNum).padStart(2, "0");
+    return `${minutesStr}:${secondsStr}`;
+}
+function getClass(...classes) {
+    return classes.flatMap(className => {
+        if (typeof className === "string")
+            return [className];
+        const classNamesArr = [];
+        for (const prop in className) {
+            if (className[prop])
+                classNamesArr.push(prop);
+        }
+        return classNamesArr;
+    }).join(' ');
+}
+function mapRange(val, range1, range2) {
+    const valueDelta = val - range1.min;
+    const range1Delta = range1.max - range1.min;
+    const percentage = valueDelta / range1Delta;
+    const range2Delta = range2.max - range2.min;
+    const mappedRange2Delta = percentage * range2Delta;
+    return mappedRange2Delta + range2.min;
+}
 
 class Canvas {
     constructor(canvas) {
@@ -149,7 +176,6 @@ class KeyframeEditor {
             };
         };
         this.collapseToggle = () => {
-            console.log('previously was:', this.isCollapsed);
             this.isCollapsed = !this.isCollapsed;
         };
     }
@@ -172,7 +198,59 @@ class KeyframeEditor {
     render() {
         return (h("div", { class: getClass("keyframe-editor", { collapsed: this.isCollapsed }) }, h("div", { class: getClass("canvas-container", { collapsed: this.isCollapsed }), ref: el => this.canvasContainer = el }, h("canvas", { ref: el => this.canvasElement = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover })), h("div", { class: getClass("expand-contract-toggle", { collapsed: this.isCollapsed }), onClick: this.collapseToggle }, h("span", null, "<"))));
     }
-    static get style() { return ".keyframe-editor {\n  --canvas-height: 50px;\n  --btn-height: 10px;\n  height: calc(var(--canvas-height) + var(--btn-height));\n  cursor: pointer;\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.keyframe-editor.collapsed {\n  height: 10px;\n}\n\n\n.canvas-container {\n  height: var(--canvas-height);\n  overflow: hidden;\n  background: rgb(226, 226, 226);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.canvas-container.collapsed {\n  height: 0px;\n}\n\n\n.expand-contract-toggle {\n  height: var(--btn-height);\n  background: rgb(32, 33, 44);\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: center;\n  justify-content: center;\n}\n.expand-contract-toggle span {\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  display: block;\n  -webkit-transform: rotate(90deg) scale(.5, 1);\n  transform: rotate(90deg) scale(.5, 1);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.expand-contract-toggle.collapsed span {\n  -webkit-transform: rotate(90deg) scale(-.5, 1);\n  transform: rotate(90deg) scale(-.5, 1);\n}"; }
+    static get style() { return ".keyframe-editor{--canvas-height:50px;--btn-height:10px;height:calc(var(--canvas-height) + var(--btn-height));cursor:pointer;-webkit-transition:.5s;transition:.5s}.keyframe-editor.collapsed{height:10px}.canvas-container{height:var(--canvas-height);overflow:hidden;background:#e2e2e2;-webkit-transition:.5s;transition:.5s}.canvas-container.collapsed{height:0}.expand-contract-toggle{height:var(--btn-height);background:#20212c;display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center}.expand-contract-toggle span{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;display:block;-webkit-transform:rotate(90deg) scaleX(.5);transform:rotate(90deg) scaleX(.5);-webkit-transition:.5s;transition:.5s}.expand-contract-toggle.collapsed span{-webkit-transform:rotate(90deg) scaleX(-.5);transform:rotate(90deg) scaleX(-.5)}"; }
 }
 
-export { KeyframeEditor as keyframe_editor };
+class KeyframedAudioPlayer {
+    constructor(hostRef) {
+        registerInstance(this, hostRef);
+        this.isPlaying = true;
+        this.currentTime = 0;
+        this.duration = 0;
+        this.updateTime = () => {
+            this.currentTime = this.audioFile.currentTime;
+        };
+        this.updateVolume = async () => {
+            const percentage = this.currentTime / this.duration;
+            const volume = await this.keyframeEditor.getHeightPercentage(percentage);
+            this.audioFile.volume = volume;
+        };
+        this.togglePlay = () => {
+            if (!this.audioFile)
+                return;
+            this.audioFile[this.isPlaying ? "play" : "pause"]();
+            this.isPlaying = !this.isPlaying;
+        };
+        this.handleTimeSeek = e => {
+            const el = e.target.className === "progress-bar" ? e.target.parentElement : e.target;
+            const { x, width } = el.getBoundingClientRect();
+            const percentage = (e.x - x) / width;
+            this.audioFile.currentTime = percentage * this.duration;
+        };
+        this.getTime = () => {
+            return `${getTimecode(this.currentTime)} / ${getTimecode(this.duration)}`;
+        };
+        this.getWidth = () => {
+            return this.currentTime / this.duration * 100 + '%';
+        };
+    }
+    componentDidUpdate() {
+        if (!this.audioFile || this.audioFile.src !== this.url)
+            this.initializeAudio();
+    }
+    initializeAudio() {
+        this.audioFile = new Audio(this.url);
+        this.audioFile.addEventListener('timeupdate', () => {
+            this.updateTime();
+            this.updateVolume();
+        });
+        this.audioFile.addEventListener('ended', this.togglePlay);
+        this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
+    }
+    render() {
+        return h("div", { class: "audioplayer" }, h("div", { class: "timeline", onClick: this.handleTimeSeek }, h("div", { class: "progress-bar", style: { width: this.getWidth() } })), h("div", { class: "body" }, h("div", { class: "play-container" + (!this.audioFile ? " disabled" : "") }, h("div", { class: (this.isPlaying ? "play" : "pause") + " btn", onClick: this.togglePlay })), h("div", { class: "name" }, this.name || "Unknown Song"), h("div", { class: "time" }, this.getTime())), h("keyframe-editor", { ref: el => this.keyframeEditor = el, open: true }));
+    }
+    static get style() { return ".audioplayer{height:50px;font-family:Arial,Helvetica,sans-serif;background:#223143;color:#fff;display:grid;grid-template-rows:auto 40px 1fr}.timeline{cursor:pointer;height:10px;background:#e2e2e2}.progress-bar{height:100%;width:0;background:coral;-webkit-transition:.5s;transition:.5s}.body{display:grid;grid-template-columns:auto 1fr auto;grid-gap:10px;-ms-flex-line-pack:center;align-content:center}.body>*{padding:5px 20px;display:-ms-flexbox;display:flex;-ms-flex-pack:center;justify-content:center;-ms-flex-align:center;align-items:center}.name{text-align:center}.btn{cursor:pointer}.play-container{width:20px}.play-container.disabled{opacity:.5}.play-container.disabled .btn{cursor:auto}.play{border:7px solid transparent;border-left:12px solid #fff;position:relative;right:-4px}.pause:after,.pause:before{content:\"\";position:absolute;width:3px;top:0;bottom:0;background:#fff}.pause{height:13px;width:11px;position:relative}.pause:before{left:0}.pause:after{right:0}"; }
+}
+
+export { KeyframeEditor as keyframe_editor, KeyframedAudioPlayer as keyframed_audio_player };

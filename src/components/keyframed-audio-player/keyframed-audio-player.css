@@ -46,6 +46,12 @@
 .play-container {
   width: 20px;
 }
+.play-container.disabled {
+  opacity: .5;
+}
+.play-container.disabled .btn {
+  cursor: auto;
+}
 
 .play {
   border: 7px solid transparent;
