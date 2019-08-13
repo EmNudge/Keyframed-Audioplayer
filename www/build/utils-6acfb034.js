@@ -18,11 +18,15 @@ function getClass(...classes) {
     }).join(' ');
 }
 function mapRange(val, range1, range2) {
+    if (range1.max - range1.min === 0)
+        return;
     const valueDelta = val - range1.min;
     const range1Delta = range1.max - range1.min;
-    const percentage = valueDelta / range1Delta;
+    const fixedDelta = range1Delta ? range1Delta * 2 : range1Delta;
+    const percentage = valueDelta / fixedDelta;
     const range2Delta = range2.max - range2.min;
-    const mappedRange2Delta = percentage * range2Delta;
+    const fixedPercentage = percentage === Infinity ? 0.5 : percentage;
+    const mappedRange2Delta = fixedPercentage * range2Delta;
     return mappedRange2Delta + range2.min;
 }
 

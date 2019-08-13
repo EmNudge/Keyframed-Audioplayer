@@ -17,7 +17,7 @@ This is the keyframed-audio-player master component. It contains a separate Audi
 
 ### Depends on
 
-- [keyframe-editor](../keyframe-editior)
+- [keyframe-editor](..\keyframe-editior)
 
 ### Graph
 ```mermaid

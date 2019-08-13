@@ -1,5 +1,8 @@
 declare class AudioContainer {
     audio: HTMLAudioElement;
+    audioContext: AudioContext;
+    track: MediaElementAudioSourceNode;
+    gainNode: GainNode;
     constructor(url: string);
     reInit(url: string): void;
     togglePlayer(): boolean;

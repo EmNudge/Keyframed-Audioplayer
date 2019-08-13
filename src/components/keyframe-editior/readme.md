@@ -29,7 +29,7 @@ Type: `Promise<number>`
 
 ### Used by
 
- - [keyframed-audio-player](../keyframed-audio-player)
+ - [keyframed-audio-player](..\keyframed-audio-player)
 
 ### Graph
 ```mermaid

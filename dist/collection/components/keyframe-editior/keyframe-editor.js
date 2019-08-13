@@ -33,6 +33,7 @@ export class KeyframeEditor {
         const num = this.canvasElement.width * widthPercentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
         const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
+        console.log(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
         const heightPercentage = mappedHeight / this.canvasElement.height;
         // inversing since we go bottom to top in the UI
         return 1 - heightPercentage;

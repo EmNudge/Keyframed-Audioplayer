@@ -1,8 +1,20 @@
 class AudioContainer {
   audio: HTMLAudioElement;
+  audioContext: AudioContext;
+  track: MediaElementAudioSourceNode;
+  gainNode: GainNode;
+
 
   constructor(url: string) {
     this.audio = new Audio(url);
+
+    const AudioCtx = AudioContext;
+    this.audioContext = new AudioCtx();
+
+    this.track = this.audioContext.createMediaElementSource(this.audio);
+    this.gainNode = this.audioContext.createGain();
+    this.track.connect(this.gainNode);
+    this.gainNode.connect(this.audioContext.destination);
   }
 
   reInit(url: string) {
@@ -13,7 +25,10 @@ class AudioContainer {
     this.audio.pause();
   }
 
-  togglePlayer() {
+  togglePlayer(): boolean {
+    if (this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
     const isPaused = this.audio.paused;
     this.audio[isPaused ? "play" : "pause"]();
     return !isPaused;
@@ -27,7 +42,7 @@ class AudioContainer {
   get currentTime() { return this.audio.currentTime; }
   set currentTime(time) { this.audio.currentTime = time; }
 
-  set volume(level) { this.audio.volume = level; }
+  set volume(level) { this.gainNode.gain.value = level; }
 
   get duration() { return this.audio.duration; }
 }

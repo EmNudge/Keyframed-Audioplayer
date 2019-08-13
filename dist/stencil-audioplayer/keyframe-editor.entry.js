@@ -1,5 +1,5 @@
 import { r as registerInstance, h } from './core-d79ee1c8.js';
-import { m as mapRange, a as getClass } from './utils-2e822dbd.js';
+import { m as mapRange, a as getClass } from './utils-6acfb034.js';
 
 class Canvas {
     constructor(canvas) {
@@ -156,6 +156,7 @@ const KeyframeEditor = class {
         const num = this.canvasElement.width * widthPercentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
         const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
+        console.log(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
         const heightPercentage = mappedHeight / this.canvasElement.height;
         // inversing since we go bottom to top in the UI
         return 1 - heightPercentage;

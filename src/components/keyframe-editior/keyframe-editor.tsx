@@ -50,10 +50,11 @@ export class KeyframeEditor {
     const num = this.canvasElement.width * widthPercentage;
     const { prev, next } = this.canvas.getSurroundingKeyframes(num);
     const mappedHeight = mapRange(
-      num, 
-      { min: prev.x, max: next.x }, 
+      num,
+      { min: prev.x, max: next.x },
       { min: prev.y, max: next.y }
     );
+    console.log(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y })
     const heightPercentage = mappedHeight / this.canvasElement.height;
 
     // inversing since we go bottom to top in the UI
@@ -76,7 +77,7 @@ export class KeyframeEditor {
       <div
         class={getClass("keyframe-editor", {collapsed: this.isCollapsed})}
       >
-        <div 
+        <div
           class={getClass("canvas-container", {collapsed: this.isCollapsed})}
           ref={el => this.canvasContainer = el as HTMLDivElement}
         >
@@ -87,7 +88,7 @@ export class KeyframeEditor {
             onMouseMove={this.handleHover}
           />
         </div>
-        <div 
+        <div
           class={getClass("expand-contract-toggle", {collapsed: this.isCollapsed})}
           onClick={this.collapseToggle}
         >
