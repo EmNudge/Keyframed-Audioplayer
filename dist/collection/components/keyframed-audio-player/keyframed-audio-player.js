@@ -9,9 +9,14 @@ export class KeyframedAudioPlayer {
         this.updateTime = () => {
             this.currentTime = this.audioContainer.currentTime;
         };
+        this.updatePan = async () => {
+            const percentage = this.currentTime / this.duration;
+            const pan = await this.keyframeEditorPan.getHeightPercentage(percentage);
+            this.audioContainer.pan = pan;
+        };
         this.updateVolume = async () => {
             const percentage = this.currentTime / this.duration;
-            const volume = await this.keyframeEditor.getHeightPercentage(percentage);
+            const volume = await this.keyframeEditorVolume.getHeightPercentage(percentage);
             this.audioContainer.volume = volume;
         };
         this.togglePlay = () => {
@@ -39,6 +44,7 @@ export class KeyframedAudioPlayer {
         });
         this.audioContainer.audio.addEventListener('timeupdate', () => {
             this.updateTime();
+            this.updatePan();
             if (!this.isPaused)
                 this.updateVolume();
         });
@@ -56,7 +62,8 @@ export class KeyframedAudioPlayer {
                     h("div", { class: (this.isPaused ? "play" : "pause") + " btn", onClick: this.togglePlay })),
                 h("div", { class: "name" }, this.name || "Unknown Song"),
                 h("div", { class: "time" }, this.getTime())),
-            h("keyframe-editor", { ref: el => this.keyframeEditor = el, open: true }));
+            h("keyframe-editor", { ref: el => this.keyframeEditorVolume = el, open: true, name: "volume" }),
+            h("keyframe-editor", { ref: el => this.keyframeEditorPan = el, open: true, name: "pan" }));
     }
     static get is() { return "keyframed-audio-player"; }
     static get encapsulation() { return "shadow"; }

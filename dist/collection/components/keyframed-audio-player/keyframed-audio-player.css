@@ -3,7 +3,8 @@
   font-family: Arial, Helvetica, sans-serif;
   background: #223143;
   color: white;
-
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-rows: auto 40px 1fr;
 }

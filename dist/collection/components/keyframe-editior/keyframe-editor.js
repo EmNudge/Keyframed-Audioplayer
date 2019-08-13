@@ -33,7 +33,6 @@ export class KeyframeEditor {
         const num = this.canvasElement.width * widthPercentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
         const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
-        console.log(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
         const heightPercentage = mappedHeight / this.canvasElement.height;
         // inversing since we go bottom to top in the UI
         return 1 - heightPercentage;
@@ -51,7 +50,9 @@ export class KeyframeEditor {
             h("div", { class: getClass("canvas-container", { collapsed: this.isCollapsed }), ref: el => this.canvasContainer = el },
                 h("canvas", { ref: el => this.canvasElement = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover })),
             h("div", { class: getClass("expand-contract-toggle", { collapsed: this.isCollapsed }), onClick: this.collapseToggle },
-                h("span", null, "<"))));
+                h("div", { class: "name" }, this.name || ''),
+                h("div", { class: "icon" },
+                    h("span", null, "<")))));
     }
     static get is() { return "keyframe-editor"; }
     static get encapsulation() { return "shadow"; }
@@ -77,6 +78,23 @@ export class KeyframeEditor {
                 "text": ""
             },
             "attribute": "open",
+            "reflect": false
+        },
+        "name": {
+            "type": "string",
+            "mutable": false,
+            "complexType": {
+                "original": "string",
+                "resolved": "string",
+                "references": {}
+            },
+            "required": false,
+            "optional": false,
+            "docs": {
+                "tags": [],
+                "text": ""
+            },
+            "attribute": "name",
             "reflect": false
         }
     }; }

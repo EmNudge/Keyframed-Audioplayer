@@ -17,7 +17,8 @@ export class KeyframedAudioPlayer {
   @State() duration: number = 0;
   @State() audioFile: HTMLAudioElement;
 
-  private keyframeEditor?: HTMLKeyframeEditorElement;
+  private keyframeEditorVolume?: HTMLKeyframeEditorElement;
+  private keyframeEditorPan?: HTMLKeyframeEditorElement;
   audioContainer: AudioContainer;
 
   componentDidLoad() {
@@ -31,6 +32,7 @@ export class KeyframedAudioPlayer {
     });
     this.audioContainer.audio.addEventListener('timeupdate', () => {
       this.updateTime();
+      this.updatePan();
       if (!this.isPaused) this.updateVolume();
     });
   }
@@ -44,9 +46,15 @@ export class KeyframedAudioPlayer {
     this.currentTime = this.audioContainer.currentTime;
   }
 
+  updatePan = async () => {
+    const percentage = this.currentTime / this.duration;
+    const pan = await this.keyframeEditorPan.getHeightPercentage(percentage);
+    this.audioContainer.pan = pan;
+  }
+
   updateVolume = async () => {
     const percentage = this.currentTime / this.duration;
-    const volume = await this.keyframeEditor.getHeightPercentage(percentage);
+    const volume = await this.keyframeEditorVolume.getHeightPercentage(percentage);
     this.audioContainer.volume = volume;
   }
 
@@ -84,8 +92,14 @@ export class KeyframedAudioPlayer {
         </div>
       </div>
       <keyframe-editor
-        ref={el => this.keyframeEditor = el as HTMLKeyframeEditorElement}
+        ref={el => this.keyframeEditorVolume = el as HTMLKeyframeEditorElement}
         open={true}
+        name="volume"
+        ></keyframe-editor>
+      <keyframe-editor
+        ref={el => this.keyframeEditorPan = el as HTMLKeyframeEditorElement}
+        open={true}
+        name="pan"
       ></keyframe-editor>
     </div>;
   }

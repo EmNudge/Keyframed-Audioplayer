@@ -1,5 +1,6 @@
 export declare class KeyframeEditor {
     open: boolean;
+    name: string;
     isCollapsed: boolean;
     private canvasElement?;
     private canvasContainer?;

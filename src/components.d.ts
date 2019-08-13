@@ -11,6 +11,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 export namespace Components {
   interface KeyframeEditor {
     'getHeightPercentage': (widthPercentage: number) => Promise<number>;
+    'name': string;
     'open': boolean;
   }
   interface KeyframedAudioPlayer {
@@ -41,6 +42,7 @@ declare global {
 
 declare namespace LocalJSX {
   interface KeyframeEditor extends JSXBase.HTMLAttributes<HTMLKeyframeEditorElement> {
+    'name'?: string;
     'open'?: boolean;
   }
   interface KeyframedAudioPlayer extends JSXBase.HTMLAttributes<HTMLKeyframedAudioPlayerElement> {

@@ -10,6 +10,7 @@ import Canvas from './canvas'
 
 export class KeyframeEditor {
   @Prop() open: boolean;
+  @Prop() name: string;
   @State() isCollapsed: boolean = false;
 
   private canvasElement?: HTMLCanvasElement;
@@ -54,7 +55,6 @@ export class KeyframeEditor {
       { min: prev.x, max: next.x },
       { min: prev.y, max: next.y }
     );
-    console.log(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y })
     const heightPercentage = mappedHeight / this.canvasElement.height;
 
     // inversing since we go bottom to top in the UI
@@ -92,7 +92,10 @@ export class KeyframeEditor {
           class={getClass("expand-contract-toggle", {collapsed: this.isCollapsed})}
           onClick={this.collapseToggle}
         >
-          <span>&lt;</span>
+          <div class="name">{this.name || ''}</div>
+          <div class="icon">
+            <span>&lt;</span>
+          </div>
         </div>
       </div>
     )

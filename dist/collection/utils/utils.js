@@ -22,8 +22,7 @@ export function mapRange(val, range1, range2) {
         return;
     const valueDelta = val - range1.min;
     const range1Delta = range1.max - range1.min;
-    const fixedDelta = range1Delta ? range1Delta * 2 : range1Delta;
-    const percentage = valueDelta / fixedDelta;
+    const percentage = valueDelta / range1Delta;
     const range2Delta = range2.max - range2.min;
     const fixedPercentage = percentage === Infinity ? 0.5 : percentage;
     const mappedRange2Delta = fixedPercentage * range2Delta;

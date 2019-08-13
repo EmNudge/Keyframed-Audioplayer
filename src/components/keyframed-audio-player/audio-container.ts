@@ -1,8 +1,11 @@
+import { mapRange } from '../../utils/utils'
+
 class AudioContainer {
   audio: HTMLAudioElement;
   audioContext: AudioContext;
   track: MediaElementAudioSourceNode;
   gainNode: GainNode;
+  panner: StereoPannerNode;
 
 
   constructor(url: string) {
@@ -13,8 +16,13 @@ class AudioContainer {
 
     this.track = this.audioContext.createMediaElementSource(this.audio);
     this.gainNode = this.audioContext.createGain();
-    this.track.connect(this.gainNode);
-    this.gainNode.connect(this.audioContext.destination);
+    this.gainNode.gain.value = .5;
+    this.panner = new StereoPannerNode(this.audioContext, { pan: 0 });
+
+    this.track
+      .connect(this.gainNode)
+      .connect(this.panner)
+      .connect(this.audioContext.destination);
   }
 
   reInit(url: string) {
@@ -43,6 +51,14 @@ class AudioContainer {
   set currentTime(time) { this.audio.currentTime = time; }
 
   set volume(level) { this.gainNode.gain.value = level; }
+  set pan(level) {
+    console.log(level)
+    this.panner.pan.value = mapRange(
+      level,
+      {min: 0, max: 1},
+      {min: -1, max: 1}
+    );
+  }
 
   get duration() { return this.audio.duration; }
 }

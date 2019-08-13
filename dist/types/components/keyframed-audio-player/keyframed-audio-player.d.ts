@@ -6,11 +6,13 @@ export declare class KeyframedAudioPlayer {
     currentTime: number;
     duration: number;
     audioFile: HTMLAudioElement;
-    private keyframeEditor?;
+    private keyframeEditorVolume?;
+    private keyframeEditorPan?;
     audioContainer: AudioContainer;
     componentDidLoad(): void;
     componentDidUpdate(): void;
     updateTime: () => void;
+    updatePan: () => Promise<void>;
     updateVolume: () => Promise<void>;
     togglePlay: () => void;
     handleTimeSeek: (e: any) => void;

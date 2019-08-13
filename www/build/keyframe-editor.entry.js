@@ -1,5 +1,5 @@
 import { r as registerInstance, h } from './core-d79ee1c8.js';
-import { m as mapRange, a as getClass } from './utils-6acfb034.js';
+import { m as mapRange, a as getClass } from './utils-9ca996e5.js';
 
 class Canvas {
     constructor(canvas) {
@@ -156,7 +156,6 @@ const KeyframeEditor = class {
         const num = this.canvasElement.width * widthPercentage;
         const { prev, next } = this.canvas.getSurroundingKeyframes(num);
         const mappedHeight = mapRange(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
-        console.log(num, { min: prev.x, max: next.x }, { min: prev.y, max: next.y });
         const heightPercentage = mappedHeight / this.canvasElement.height;
         // inversing since we go bottom to top in the UI
         return 1 - heightPercentage;
@@ -170,9 +169,9 @@ const KeyframeEditor = class {
         this.canvas.draw();
     }
     render() {
-        return (h("div", { class: getClass("keyframe-editor", { collapsed: this.isCollapsed }) }, h("div", { class: getClass("canvas-container", { collapsed: this.isCollapsed }), ref: el => this.canvasContainer = el }, h("canvas", { ref: el => this.canvasElement = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover })), h("div", { class: getClass("expand-contract-toggle", { collapsed: this.isCollapsed }), onClick: this.collapseToggle }, h("span", null, "<"))));
+        return (h("div", { class: getClass("keyframe-editor", { collapsed: this.isCollapsed }) }, h("div", { class: getClass("canvas-container", { collapsed: this.isCollapsed }), ref: el => this.canvasContainer = el }, h("canvas", { ref: el => this.canvasElement = el, onMouseDown: this.canvasClick, onMouseUp: this.canvasRelease, onMouseMove: this.handleHover })), h("div", { class: getClass("expand-contract-toggle", { collapsed: this.isCollapsed }), onClick: this.collapseToggle }, h("div", { class: "name" }, this.name || ''), h("div", { class: "icon" }, h("span", null, "<")))));
     }
-    static get style() { return ".keyframe-editor {\n  --canvas-height: 50px;\n  --btn-height: 10px;\n  height: calc(var(--canvas-height) + var(--btn-height));\n  cursor: pointer;\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.keyframe-editor.collapsed {\n  height: 10px;\n}\n\n\n.canvas-container {\n  height: var(--canvas-height);\n  overflow: hidden;\n  background: rgb(226, 226, 226);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.canvas-container.collapsed {\n  height: 0px;\n}\n\n\n.expand-contract-toggle {\n  height: var(--btn-height);\n  background: rgb(32, 33, 44);\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: center;\n  justify-content: center;\n}\n.expand-contract-toggle span {\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  display: block;\n  -webkit-transform: rotate(90deg) scale(.5, 1);\n  transform: rotate(90deg) scale(.5, 1);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.expand-contract-toggle.collapsed span {\n  -webkit-transform: rotate(90deg) scale(-.5, 1);\n  transform: rotate(90deg) scale(-.5, 1);\n}"; }
+    static get style() { return ".keyframe-editor {\n  --canvas-height: 50px;\n  --btn-height: 10px;\n  height: calc(var(--canvas-height) + var(--btn-height));\n  cursor: pointer;\n  -webkit-transition: .5s;\n  transition: .5s;\n  position: relative;\n}\n.keyframe-editor.collapsed {\n  height: 10px;\n}\n\n.canvas-container {\n  height: var(--canvas-height);\n  overflow: hidden;\n  background: rgb(226, 226, 226);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.canvas-container.collapsed {\n  height: 0px;\n}\n\n.expand-contract-toggle > * {\n  -webkit-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  height: var(--btn-height);\n}\n.expand-contract-toggle {\n  background: rgb(32, 33, 44);\n  display: grid;\n  grid-template-columns: 20px 1fr;\n  -ms-flex-line-pack: center;\n  align-content: center;\n  padding: 0 8px;\n}\n\n.expand-contract-toggle .icon {\n  display: -ms-flexbox;\n  display: flex;\n  -ms-flex-pack: center;\n  justify-content: center;\n}\n.expand-contract-toggle .icon span {\n  -webkit-transform: rotate(90deg) scale(.5, 1);\n  transform: rotate(90deg) scale(.5, 1);\n  -webkit-transition: .5s;\n  transition: .5s;\n}\n.expand-contract-toggle.collapsed .icon span {\n  -webkit-transform: rotate(90deg) scale(-.5, 1);\n  transform: rotate(90deg) scale(-.5, 1);\n}\n\n.expand-contract-toggle .name {\n  color: rgba(255, 255, 255, 0.4);\n  font-size: 9px;\n}"; }
 };
 
 export { KeyframeEditor as keyframe_editor };
