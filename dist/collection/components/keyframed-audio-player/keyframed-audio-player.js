@@ -1,65 +1,59 @@
 import { h } from "@stencil/core";
 import { getTimecode } from '../../utils/utils';
+import AudioContainer from './audio-container';
 export class KeyframedAudioPlayer {
     constructor() {
-        this.isPlaying = true;
+        this.isPaused = true;
         this.currentTime = 0;
         this.duration = 0;
         this.updateTime = () => {
-            this.currentTime = this.audioFile.currentTime;
+            this.currentTime = this.audioContainer.currentTime;
         };
         this.updateVolume = async () => {
             const percentage = this.currentTime / this.duration;
             const volume = await this.keyframeEditor.getHeightPercentage(percentage);
-            this.audioFile.volume = volume;
+            this.audioContainer.volume = volume;
         };
         this.togglePlay = () => {
-            if (!this.audioFile)
+            if (!this.url)
                 return;
-            this.audioFile[this.isPlaying ? "play" : "pause"]();
-            this.isPlaying = !this.isPlaying;
+            this.isPaused = this.audioContainer.togglePlayer();
         };
         this.handleTimeSeek = e => {
             const el = e.target.className === "progress-bar" ? e.target.parentElement : e.target;
             const { x, width } = el.getBoundingClientRect();
             const percentage = (e.x - x) / width;
-            this.audioFile.currentTime = percentage * this.duration;
+            this.audioContainer.currentTime = percentage * this.duration;
         };
-        this.getTime = () => {
-            return `${getTimecode(this.currentTime)} / ${getTimecode(this.duration)}`;
-        };
-        this.getWidth = () => {
-            return this.currentTime / this.duration * 100 + '%';
-        };
+        this.getTime = () => `${getTimecode(this.currentTime)} / ${getTimecode(this.duration)}`;
+        this.getWidth = () => this.currentTime / this.duration * 100 + '%';
+    }
+    componentDidLoad() {
+        this.audioContainer = new AudioContainer(this.url);
+        this.audioContainer.audio.addEventListener('loadeddata', () => {
+            this.duration = this.audioContainer.duration;
+        });
+        this.audioContainer.audio.addEventListener('ended', () => {
+            this.audioContainer.reset();
+            this.isPaused = true;
+        });
+        this.audioContainer.audio.addEventListener('timeupdate', () => {
+            this.updateTime();
+            if (!this.isPaused)
+                this.updateVolume();
+        });
     }
     componentDidUpdate() {
-        if (!this.audioFile) {
-            this.initializeAudio();
-            return;
-        }
-        if (this.audioFile.src !== this.url) {
-            if (!this.isPlaying)
-                this.togglePlay();
-            this.initializeAudio();
-        }
-    }
-    initializeAudio() {
-        this.audioFile = new Audio(this.url);
-        this.audioFile.addEventListener('timeupdate', () => {
-            this.updateTime();
-            this.updateVolume();
-        });
-        this.audioFile.addEventListener('ended', this.togglePlay);
-        this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
-        this.updateTime();
+        // internally checks if it should reload, but resets audio to start regardless
+        this.audioContainer.reInit(this.url);
     }
     render() {
         return h("div", { class: "audioplayer" },
             h("div", { class: "timeline", onClick: this.handleTimeSeek },
                 h("div", { class: "progress-bar", style: { width: this.getWidth() } })),
             h("div", { class: "body" },
-                h("div", { class: "play-container" + (!this.audioFile ? " disabled" : "") },
-                    h("div", { class: (this.isPlaying ? "play" : "pause") + " btn", onClick: this.togglePlay })),
+                h("div", { class: "play-container" + (!this.url ? " disabled" : "") },
+                    h("div", { class: (this.isPaused ? "play" : "pause") + " btn", onClick: this.togglePlay })),
                 h("div", { class: "name" }, this.name || "Unknown Song"),
                 h("div", { class: "time" }, this.getTime())),
             h("keyframe-editor", { ref: el => this.keyframeEditor = el, open: true }));
@@ -109,7 +103,7 @@ export class KeyframedAudioPlayer {
         }
     }; }
     static get states() { return {
-        "isPlaying": {},
+        "isPaused": {},
         "currentTime": {},
         "duration": {},
         "audioFile": {}

@@ -1,6 +1,6 @@
 # my-component
 
-
+This is the keyframed-audio-player master component. It contains a separate AudioContainer class to handle the non-visual calculations.
 
 <!-- Auto Generated Below -->
 

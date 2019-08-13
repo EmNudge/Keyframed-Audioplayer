@@ -1,13 +1,15 @@
+import AudioContainer from './audio-container';
 export declare class KeyframedAudioPlayer {
     name: string;
     url: string;
-    isPlaying: boolean;
+    isPaused: boolean;
     currentTime: number;
     duration: number;
     audioFile: HTMLAudioElement;
     private keyframeEditor?;
+    audioContainer: AudioContainer;
+    componentDidLoad(): void;
     componentDidUpdate(): void;
-    initializeAudio(): void;
     updateTime: () => void;
     updateVolume: () => Promise<void>;
     togglePlay: () => void;

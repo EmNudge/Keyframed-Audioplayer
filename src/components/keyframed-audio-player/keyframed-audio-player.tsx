@@ -1,5 +1,6 @@
 import { Component, Prop, State, h } from '@stencil/core';
 import { getTimecode } from '../../utils/utils'
+import AudioContainer from './audio-container'
 
 @Component({
   tag: 'keyframed-audio-player',
@@ -11,66 +12,59 @@ export class KeyframedAudioPlayer {
   @Prop() name: string;
   @Prop() url: string;
 
-  @State() isPlaying: boolean = true;
+  @State() isPaused: boolean = true;
   @State() currentTime: number = 0;
   @State() duration: number = 0;
   @State() audioFile: HTMLAudioElement;
 
   private keyframeEditor?: HTMLKeyframeEditorElement;
+  audioContainer: AudioContainer;
 
-  componentDidUpdate() {
-    if (!this.audioFile) {
-      this.initializeAudio()
-      return;
-    }
-    if (this.audioFile.src !== this.url) {
-      if (!this.isPlaying) this.togglePlay();
-      this.initializeAudio();
-    }
+  componentDidLoad() {
+    this.audioContainer = new AudioContainer(this.url);
+    this.audioContainer.audio.addEventListener('loadeddata', () => {
+      this.duration = this.audioContainer.duration;
+    });
+    this.audioContainer.audio.addEventListener('ended', () => {
+      this.audioContainer.reset();
+      this.isPaused = true;
+    });
+    this.audioContainer.audio.addEventListener('timeupdate', () => {
+      this.updateTime();
+      if (!this.isPaused) this.updateVolume();
+    });
   }
 
-  initializeAudio() {
-    this.audioFile = new Audio(this.url);
-    this.audioFile.addEventListener('timeupdate', () => {
-      this.updateTime();
-      this.updateVolume();
-    });
-    this.audioFile.addEventListener('ended', this.togglePlay);
-    this.audioFile.addEventListener('loadeddata', () => this.duration = this.audioFile.duration);
-    this.updateTime();
+  componentDidUpdate() {
+    // internally checks if it should reload, but resets audio to start regardless
+    this.audioContainer.reInit(this.url);
   }
 
   updateTime = () => {
-    this.currentTime = this.audioFile.currentTime;
+    this.currentTime = this.audioContainer.currentTime;
   }
 
   updateVolume = async () => {
     const percentage = this.currentTime / this.duration;
     const volume = await this.keyframeEditor.getHeightPercentage(percentage);
-    this.audioFile.volume = volume;
+    this.audioContainer.volume = volume;
   }
 
-
   togglePlay = () => {
-    if (!this.audioFile) return;
-    this.audioFile[this.isPlaying ? "play" : "pause"]();
-    this.isPlaying = !this.isPlaying;
+    if (!this.url) return;
+    this.isPaused = this.audioContainer.togglePlayer()
   }
 
   handleTimeSeek = e => {
     const el = e.target.className === "progress-bar" ? e.target.parentElement : e.target;
     const { x, width } = el.getBoundingClientRect();
     const percentage = (e.x - x) / width;
-    this.audioFile.currentTime = percentage * this.duration;
+    this.audioContainer.currentTime = percentage * this.duration;
   }
 
-  getTime = () => {
-    return `${getTimecode(this.currentTime)} / ${getTimecode(this.duration)}`
-  }
+  getTime = () => `${getTimecode(this.currentTime)} / ${getTimecode(this.duration)}`
 
-  getWidth = () => {
-    return this.currentTime / this.duration * 100 + '%'
-  }
+  getWidth = () => this.currentTime / this.duration * 100 + '%'
 
   render() {
     return <div class="audioplayer">
@@ -78,9 +72,9 @@ export class KeyframedAudioPlayer {
         <div class="progress-bar" style={{width: this.getWidth()}}></div>
       </div>
       <div class="body">
-        <div class={"play-container" + (!this.audioFile ? " disabled" : "")}>
+        <div class={"play-container" + (!this.url ? " disabled" : "")}>
           <div
-            class={(this.isPlaying ? "play" : "pause") + " btn"}
+            class={(this.isPaused ? "play" : "pause") + " btn"}
             onClick={this.togglePlay}
           />
         </div>
