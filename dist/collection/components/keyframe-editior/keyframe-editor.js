@@ -4,11 +4,20 @@ import Canvas from './canvas';
 export class KeyframeEditor {
     constructor() {
         this.isCollapsed = false;
+        this.canvasClicked = false;
         this.canvasClick = e => {
             this.canvas.onClick(this.getPos(e));
+            this.canvasClicked = true;
+            setTimeout(() => this.canvasClicked = false, 0);
         };
         this.canvasRelease = () => {
             this.canvas.onRelease();
+        };
+        this.deselect = () => {
+            if (this.canvasClicked || !this.canvas.hasSelected())
+                return;
+            // if the canvas hasn't been clicked and it has an item selected, deselect the item
+            this.canvas.deselect();
         };
         this.handleHover = e => {
             this.canvas.handleHover(this.getPos(e));
@@ -42,6 +51,7 @@ export class KeyframeEditor {
         this.canvasElement.width = width;
         this.canvasElement.height = height;
         window.addEventListener('keydown', this.handleKeyPress);
+        window.addEventListener('mousedown', this.deselect);
         this.canvas = new Canvas(this.canvasElement);
         this.canvas.draw();
     }

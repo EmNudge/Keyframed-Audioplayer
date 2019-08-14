@@ -38,7 +38,6 @@ class AudioContainer {
     set currentTime(time) { this.audio.currentTime = time; }
     set volume(level) { this.gainNode.gain.value = level; }
     set pan(level) {
-        console.log(level);
         this.panner.pan.value = mapRange(level, { min: 0, max: 1 }, { min: -1, max: 1 });
     }
     get duration() { return this.audio.duration; }

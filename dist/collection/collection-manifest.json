@@ -1,7 +1,7 @@
 {
   "entries": [
-    "components\\keyframed-audio-player\\keyframed-audio-player.js",
-    "components\\keyframe-editior\\keyframe-editor.js"
+    "components\\keyframe-editior\\keyframe-editor.js",
+    "components\\keyframed-audio-player\\keyframed-audio-player.js"
   ],
   "compiler": {
     "name": "@stencil/core",

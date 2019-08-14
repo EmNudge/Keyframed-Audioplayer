@@ -95,12 +95,12 @@ export class KeyframedAudioPlayer {
         ref={el => this.keyframeEditorVolume = el as HTMLKeyframeEditorElement}
         open={true}
         name="volume"
-        ></keyframe-editor>
+      />
       <keyframe-editor
         ref={el => this.keyframeEditorPan = el as HTMLKeyframeEditorElement}
         open={true}
         name="pan"
-      ></keyframe-editor>
+      />
     </div>;
   }
 }

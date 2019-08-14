@@ -21,6 +21,8 @@ class Canvas {
         this.mousePos = mousePos;
         if (this.draggedId === null)
             return;
+        if (this.isColliding(mousePos))
+            return;
         this.keyframes = this.sortKeyframes(this.keyframes.map(keyframe => this.draggedId === keyframe.id ? Object.assign({}, mousePos, { id: keyframe.id }) : keyframe));
     }
     onClick(mousePos) {
@@ -63,6 +65,12 @@ class Canvas {
             if (keyframe.id === id)
                 return index;
         }
+    }
+    hasSelected() {
+        return this.selectedId !== null;
+    }
+    deselect() {
+        this.selectedId = null;
     }
     drawLine() {
         const keyframes = this.getFullKeyframes();
@@ -109,6 +117,11 @@ class Canvas {
         const distY = point.y - circle.y;
         return Math.sqrt(distX ** 2 + distY ** 2);
     }
+    isColliding(mousePos) {
+        return this.keyframes.some(keyframe => {
+            return Math.abs(mousePos.x - keyframe.x) < 2;
+        });
+    }
     drawKeyframe(keyframe) {
         const isHovering = this.getDist(this.mousePos, keyframe) < 8;
         const isSelected = keyframe.id === this.selectedId;
@@ -127,11 +140,20 @@ const KeyframeEditor = class {
     constructor(hostRef) {
         registerInstance(this, hostRef);
         this.isCollapsed = false;
+        this.canvasClicked = false;
         this.canvasClick = e => {
             this.canvas.onClick(this.getPos(e));
+            this.canvasClicked = true;
+            setTimeout(() => this.canvasClicked = false, 0);
         };
         this.canvasRelease = () => {
             this.canvas.onRelease();
+        };
+        this.deselect = () => {
+            if (this.canvasClicked || !this.canvas.hasSelected())
+                return;
+            // if the canvas hasn't been clicked and it has an item selected, deselect the item
+            this.canvas.deselect();
         };
         this.handleHover = e => {
             this.canvas.handleHover(this.getPos(e));
@@ -165,6 +187,7 @@ const KeyframeEditor = class {
         this.canvasElement.width = width;
         this.canvasElement.height = height;
         window.addEventListener('keydown', this.handleKeyPress);
+        window.addEventListener('mousedown', this.deselect);
         this.canvas = new Canvas(this.canvasElement);
         this.canvas.draw();
     }

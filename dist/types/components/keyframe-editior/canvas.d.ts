@@ -29,10 +29,13 @@ export default class Canvas {
     onDelete(): void;
     sortKeyframes(keyframes: Keyframe[]): Keyframe[];
     getKeyframeIndex(id: symbol): number;
+    hasSelected(): boolean;
+    deselect(): void;
     drawLine(): void;
     getFullKeyframes(): Keyframe[];
     getSurroundingKeyframes(xPos: number): SurroundingPos;
     getDist(point: Position, circle: Position | Keyframe): number;
+    isColliding(mousePos: Position): boolean;
     drawKeyframe(keyframe: Keyframe): void;
 }
 export {};

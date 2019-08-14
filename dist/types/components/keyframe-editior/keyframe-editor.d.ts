@@ -5,8 +5,10 @@ export declare class KeyframeEditor {
     private canvasElement?;
     private canvasContainer?;
     private canvas;
+    private canvasClicked;
     canvasClick: (e: any) => void;
     canvasRelease: () => void;
+    deselect: () => void;
     handleHover: (e: any) => void;
     handleKeyPress: (e: any) => void;
     getPos: (e: any) => {

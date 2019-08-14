@@ -47,9 +47,9 @@ export default class Canvas {
   handleHover(mousePos: Position) {
     this.mousePos = mousePos;
     if (this.draggedId === null) return;
-    
+    if (this.isColliding(mousePos)) return;
 
-    this.keyframes = this.sortKeyframes(this.keyframes.map(keyframe => 
+    this.keyframes = this.sortKeyframes(this.keyframes.map(keyframe =>
       this.draggedId === keyframe.id ? { ...mousePos, id: keyframe.id } : keyframe
     ));
   }
@@ -88,7 +88,7 @@ export default class Canvas {
       return;
     }
     // change selected ID
-    const newIndex =  this.keyframes.length > selectedIndex ? selectedIndex : selectedIndex - 1; 
+    const newIndex =  this.keyframes.length > selectedIndex ? selectedIndex : selectedIndex - 1;
     this.selectedId = this.keyframes[newIndex].id;
   }
 
@@ -100,6 +100,13 @@ export default class Canvas {
     for (const [index, keyframe] of this.keyframes.entries()) {
       if (keyframe.id === id) return index;
     }
+  }
+
+  hasSelected() {
+    return this.selectedId !== null;
+  }
+  deselect() {
+    this.selectedId = null;
   }
 
   drawLine() {
@@ -152,6 +159,12 @@ export default class Canvas {
     const distX = point.x - circle.x;
     const distY = point.y - circle.y;
     return Math.sqrt(distX**2 + distY**2);
+  }
+
+  isColliding(mousePos: Position) {
+    return this.keyframes.some(keyframe => {
+      return Math.abs(mousePos.x - keyframe.x) < 2
+    })
   }
 
   drawKeyframe(keyframe: Keyframe) {

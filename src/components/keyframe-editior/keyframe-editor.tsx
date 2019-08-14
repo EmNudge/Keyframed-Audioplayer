@@ -16,13 +16,21 @@ export class KeyframeEditor {
   private canvasElement?: HTMLCanvasElement;
   private canvasContainer?: HTMLDivElement;
   private canvas: Canvas;
+  private canvasClicked: boolean = false;
 
   canvasClick = e => {
-    this.canvas.onClick(this.getPos(e));
+    this.canvas.onClick(this.getPos(e))
+    this.canvasClicked = true;
+    setTimeout(() => this.canvasClicked = false, 0);
   }
 
   canvasRelease = () => {
     this.canvas.onRelease();
+  }
+  deselect = () => {
+    if (this.canvasClicked || !this.canvas.hasSelected()) return;
+    // if the canvas hasn't been clicked and it has an item selected, deselect the item
+    this.canvas.deselect();
   }
 
   handleHover = e => {
@@ -67,6 +75,7 @@ export class KeyframeEditor {
     this.canvasElement.height = height;
 
     window.addEventListener('keydown', this.handleKeyPress);
+    window.addEventListener('mousedown', this.deselect);
 
     this.canvas = new Canvas(this.canvasElement);
     this.canvas.draw();
