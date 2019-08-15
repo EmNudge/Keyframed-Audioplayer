@@ -9,6 +9,7 @@
 
 | Property | Attribute | Description | Type      | Default     |
 | -------- | --------- | ----------- | --------- | ----------- |
+| `name`   | `name`    |             | `string`  | `undefined` |
 | `open`   | `open`    |             | `boolean` | `undefined` |
 
 

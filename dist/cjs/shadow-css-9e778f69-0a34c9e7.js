@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -354,4 +356,4 @@ const scopeCss = (cssText, scopeId, commentOriginalSelector) => {
     return cssText;
 };
 
-export { scopeCss };
+exports.scopeCss = scopeCss;

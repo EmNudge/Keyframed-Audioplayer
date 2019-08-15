@@ -35,7 +35,7 @@ export default class Canvas {
     getFullKeyframes(): Keyframe[];
     getSurroundingKeyframes(xPos: number): SurroundingPos;
     getDist(point: Position, circle: Position | Keyframe): number;
-    isColliding(mousePos: Position): boolean;
+    isColliding(keyframe: Keyframe): boolean;
     drawKeyframe(keyframe: Keyframe): void;
 }
 export {};

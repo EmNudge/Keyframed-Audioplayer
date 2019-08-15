@@ -18,7 +18,7 @@ export default class Canvas {
         this.mousePos = mousePos;
         if (this.draggedId === null)
             return;
-        if (this.isColliding(mousePos))
+        if (this.isColliding(Object.assign({}, mousePos, { id: this.draggedId })))
             return;
         this.keyframes = this.sortKeyframes(this.keyframes.map(keyframe => this.draggedId === keyframe.id ? Object.assign({}, mousePos, { id: keyframe.id }) : keyframe));
     }
@@ -114,9 +114,9 @@ export default class Canvas {
         const distY = point.y - circle.y;
         return Math.sqrt(distX ** 2 + distY ** 2);
     }
-    isColliding(mousePos) {
-        return this.keyframes.some(keyframe => {
-            return Math.abs(mousePos.x - keyframe.x) < 2;
+    isColliding(keyframe) {
+        return this.keyframes.some(kf => {
+            return Math.abs(keyframe.x - kf.x) < 2 && keyframe.id !== kf.id;
         });
     }
     drawKeyframe(keyframe) {

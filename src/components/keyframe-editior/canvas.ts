@@ -47,7 +47,7 @@ export default class Canvas {
   handleHover(mousePos: Position) {
     this.mousePos = mousePos;
     if (this.draggedId === null) return;
-    if (this.isColliding(mousePos)) return;
+    if (this.isColliding({ ...mousePos, id: this.draggedId})) return;
 
     this.keyframes = this.sortKeyframes(this.keyframes.map(keyframe =>
       this.draggedId === keyframe.id ? { ...mousePos, id: keyframe.id } : keyframe
@@ -161,9 +161,9 @@ export default class Canvas {
     return Math.sqrt(distX**2 + distY**2);
   }
 
-  isColliding(mousePos: Position) {
-    return this.keyframes.some(keyframe => {
-      return Math.abs(mousePos.x - keyframe.x) < 2
+  isColliding(keyframe: Keyframe): boolean {
+    return this.keyframes.some(kf => {
+      return Math.abs(keyframe.x - kf.x) < 2 && keyframe.id !== kf.id
     })
   }
 
